@@ -1,6 +1,6 @@
 const path = require('path');
 // Ajuste fundamental: indica que o .env está uma pasta acima da 'src'
-require("dotenv").config({ path: path.join(__dirname, "../.env") });
+require("dotenv").config();
 
 const cron = require("node-cron");
 const axios = require("axios");
