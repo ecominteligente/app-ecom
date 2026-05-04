@@ -3,17 +3,18 @@ const express = require("express");
 
 const app = express();
 
-const frontendPath = path.join(__dirname, '..', '..', 'frontend');
+// 🔥 caminho absoluto (HOSTINGER)
+const frontendPath = "/home/u511733894/domains/ecominteligente.com.br/nodejs/frontend";
 
-// servir arquivos estáticos
+// servir arquivos
 app.use(express.static(frontendPath));
 
-// 🔥 rota principal (ESSENCIAL)
+// rota principal
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
-// 🔥 fallback (qualquer rota abre o index)
+// fallback
 app.get("*", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
