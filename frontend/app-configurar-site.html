@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar Site - Ecom Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0066ff;
+            --primary-hover: #0284c7;
+            --bg-dark: #030712;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #0ea5e9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 35%),
+                radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.1) 0%, transparent 35%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .brand {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 40px;
+            letter-spacing: -1px;
+        }
+        .brand span { color: var(--primary); }
+
+        .container-premium {
+            width: 100%;
+            max-width: 1100px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-text { text-align: center; margin-bottom: 40px; }
+        .header-text h1 { font-size: 32px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .header-text p { color: var(--text-muted); font-size: 16px; }
+
+        /* LAYOUT */
+        .config-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1.8fr;
+            gap: 24px;
+            width: 100%;
+        }
+
+        .config-column {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            height: fit-content;
+        }
+
+        .section-recommended {
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            background: linear-gradient(180deg, rgba(14, 165, 233, 0.05) 0%, transparent 100%);
+        }
+
+        h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .main-data h3 { color: #fff; }
+        .section-recommended h3 { color: var(--primary); }
+
+        /* FORMULÁRIO */
+        .input-group { margin-bottom: 24px; }
+        .input-group label { 
+            display: block; 
+            font-size: 12px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: var(--text-muted); 
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .input-wrapper { position: relative; }
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        .btn-activate {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-activate:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(14, 165, 233, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 0 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: auto;
+        }
+
+        /* RESPONSIVO */
+        @media (max-width: 992px) {
+            .config-layout { grid-template-columns: 1fr; }
+            .header-text h1 { font-size: 26px; }
+        }
+
+        @media (max-width: 600px) {
+            .input-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .config-column { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="brand">
+    Ecom <span>Inteligente</span>
+</div>
+
+<div class="container-premium">
+    <div class="header-text">
+        <h1>Configuração do Monitor</h1>
+        <p>Conecte sua propriedade do Google Analytics 4 em menos de 1 minuto.</p>
+    </div>
+
+    <form id="form-config" class="config-layout">
+        
+        <div class="config-column main-data">
+            <h3><i class="fa-solid fa-gears"></i> Dados do Site</h3>
+            
+            <div class="input-group">
+                <label>Nome do Projeto</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-tag"></i>
+                    <input type="text" id="site_name" placeholder="Ex: Minha Loja Virtual" required>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>URL Principal</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-link"></i>
+                    <input type="url" id="site_url" placeholder="https://www.site.com.br" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>ID da Propriedade GA4</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <input type="text" id="ga4_id" placeholder="Ex: 345678901" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-activate">Ativar Dashboard 🚀</button>
+        </div>
+
+        <div class="config-column section-recommended">
+            <h3><i class="fa-solid fa-bolt"></i> Mapeamento Real-Time</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">Defina os nomes dos eventos personalizados que você usa no GTM/GA4.</p>
+
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Botão WhatsApp</label>
+                    <div class="input-wrapper">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <input type="text" id="event_whatsapp" placeholder="click_whatsapp">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Evento de Venda</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <input type="text" id="event_purchase" placeholder="purchase">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Início Checkout</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <input type="text" id="event_checkout" placeholder="begin_checkout">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Adicionar Carrinho</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-plus"></i>
+                        <input type="text" id="event_cart" placeholder="add_to_cart">
+                    </div>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Captação de Lead / Formulário</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <input type="text" id="event_lead" placeholder="generate_lead">
+                    </div>
+                </div>
+            </div>
+            
+            <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 10px;">
+                <i class="fa-solid fa-circle-info"></i> Se deixar em branco, usaremos os nomes padrão do GA4.
+            </p>
+        </div>
+
+    </form>
+</div>
+
+<footer>
+    &copy; 2026 Ecom Inteligente - Tecnologia em Gestão de Performance
+</footer>
+
+<script>
+    // 1. CAPTURA O ID DA URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteIdParaEditar = urlParams.get('id');
+
+    function verificarAcesso() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.replace('app-login.html');
+            return false;
+        }
+        document.body.style.display = "flex";
+        return true;
+    }
+
+    async function carregarDadosParaEdicao() {
+        if (!siteIdParaEditar) {
+            console.log("🚀 Modo: Cadastro Novo");
+            return;
+        }
+
+        console.log("📝 Modo: Edição Ativado para o ID:", siteIdParaEditar);
+        
+        // Ajusta os textos da tela
+        const titulo = document.querySelector('h1');
+        const botao = document.querySelector('.btn-activate');
+        if(titulo) titulo.innerText = "Editar Configuração";
+        if(botao) botao.innerText = "Salvar Alterações";
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`https://ecominteligente.com.br/api/sites/detalhes/${siteIdParaEditar}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const site = await res.json();
+
+            if (res.ok) {
+                // Preenchimento seguro (verifica se o elemento existe antes de setar o valor)
+                if(document.getElementById('site_name')) document.getElementById('site_name').value = site.name || '';
+                if(document.getElementById('site_url')) document.getElementById('site_url').value = site.url || '';
+                if(document.getElementById('ga4_id')) document.getElementById('ga4_id').value = site.ga4_property_id || '';
+                if(document.getElementById('event_whatsapp')) document.getElementById('event_whatsapp').value = site.event_whatsapp || '';
+                if(document.getElementById('event_purchase')) document.getElementById('event_purchase').value = site.event_purchase || '';
+                if(document.getElementById('event_checkout')) document.getElementById('event_checkout').value = site.event_checkout || '';
+                if(document.getElementById('event_cart')) document.getElementById('event_cart').value = site.event_cart || '';
+                if(document.getElementById('event_lead')) document.getElementById('event_lead').value = site.event_lead || '';
+                console.log("✅ Dados carregados com sucesso!");
+            }
+        } catch (err) {
+            console.error("❌ Erro ao carregar dados:", err);
+        }
+    }
+
+    async function enviarDados(event) {
+        // MUITO IMPORTANTE: Previne o comportamento padrão do form
+        event.preventDefault();
+        event.stopPropagation();
+        
+        console.log("adsasdsda Clique detectado! Iniciando salvamento...");
+
+        const msg = document.getElementById('mensagem');
+        if(msg) {
+            msg.style.color = "#fff";
+            msg.textContent = "⚙️ Processando...";
+        }
+
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+
+        const dados = {
+    user_id: userId,
+    name: document.getElementById('site_name').value,
+    url: document.getElementById('site_url').value,
+    ga4_property_id: document.getElementById('ga4_id').value,
+
+    event_whatsapp: document.getElementById('event_whatsapp').value.trim(), // 👈 vírgula aqui
+
+    event_purchase: document.getElementById('event_purchase').value,
+    event_checkout: document.getElementById('event_checkout').value,
+    event_cart: document.getElementById('event_cart').value,
+    event_lead: document.getElementById('event_lead').value
+};
+
+        const metodo = siteIdParaEditar ? 'PUT' : 'POST';
+        const urlFinal = siteIdParaEditar 
+    ? `https://ecominteligente.com.br/api/sites/update/${siteIdParaEditar}` 
+    : 'https://ecominteligente.com.br/api/sites/add';
+        
+        console.log(`📡 Enviando via ${metodo} para: ${urlFinal}`);
+
+        try {
+            const response = await fetch(urlFinal, {
+                method: metodo,
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(dados)
+            });
+
+            console.log("Status da resposta:", response.status);
+
+            if (response.ok) {
+                if(msg) {
+                    msg.style.color = "#10b981";
+                    msg.textContent = "✅ Sucesso! Redirecionando...";
+                }
+                console.log("✅ Salvo com sucesso! Redirecionando em 1.5s...");
+                setTimeout(() => {
+                    window.location.href = 'app-meus-sites.html';
+                }, 1500);
+            } else {
+                const resErro = await response.json();
+                if(msg) {
+                    msg.style.color = "#ef4444";
+                    msg.textContent = "❌ Erro: " + (resErro.error || "Falha ao salvar");
+                }
+                console.error("❌ Erro do servidor:", resErro);
+            }
+        } catch (err) {
+            console.error("❌ Erro na requisição:", err);
+            if(msg) msg.textContent = "❌ Servidor offline ou erro de rede.";
+        }
+    }
+
+    // INICIALIZAÇÃO CORRETA
+    if (verificarAcesso()) {
+        window.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('form-config');
+            if (form) {
+                form.addEventListener('submit', enviarDados);
+                console.log("🎯 Event Listener de submit ativado!");
+            } else {
+                console.error("❌ Erro: Formulário 'form-config' não encontrado!");
+            }
+            carregarDadosParaEdicao();
+        });
+    }
+</script>
+</body>
+</html>

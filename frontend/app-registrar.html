@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta | Ecom Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066ff;
+            --bg-dark: #05060a;
+            --card-bg: #0f121a;
+            --text-main: #ffffff;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .register-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo { font-size: 24px; font-weight: 800; margin-bottom: 30px; }
+        .logo span { color: var(--primary); }
+
+        h2 { margin-bottom: 10px; font-size: 20px; }
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 25px; }
+
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-size: 13px; margin-bottom: 5px; color: #94a3b8; }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #1a1d26;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-register:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .login-link { margin-top: 20px; font-size: 13px; color: #94a3b8; }
+        .login-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="register-card">
+        <div class="logo">Ecom <span>Inteligente</span></div>
+        <h2>Comece seu teste grátis</h2>
+        <p id="info-plano">Criando sua conta de monitoramento...</p>
+
+        <form id="form-register">
+            <div class="input-group">
+                <label>Nome Completo</label>
+                <input type="text" id="nome" placeholder="Seu nome" required>
+            </div>
+            <div class="input-group">
+                <label>E-mail Corporativo</label>
+                <input type="email" id="email" placeholder="seu@email.com" required>
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="senha" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-register">Criar minha conta</button>
+        </form>
+
+        <div class="login-link">
+            Já tem uma conta? <a href="app-login.html">Fazer login</a>
+        </div>
+    </div>
+
+    <script>
+    // 1. CAPTURAR O PLANO DA URL (Vindo da página de monitoramento)
+    const urlParams = new URLSearchParams(window.location.search);
+    const planoEscolhido = urlParams.get('plano');
+
+    // Mostrar um aviso visual se houver plano selecionado
+    if (planoEscolhido) {
+        const infoPlano = document.getElementById('info-plano');
+        if (infoPlano) {
+            infoPlano.innerText = "Você selecionou um plano. Seu teste de 7 dias começa agora!";
+            infoPlano.style.color = "#34d399";
+        }
+    }
+
+    // 2. LÓGICA DE CADASTRO
+    document.getElementById('form-register').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nome = document.getElementById('nome').value;
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+
+        try {
+            // Ajustado para o seu domínio oficial na Hostinger
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    nome, 
+                    email, 
+                    senha,
+                    plano: planoEscolhido // Garante que o backend ative o período de trial corretamente
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("Conta criada com sucesso! Aproveite seus 7 dias de teste.");
+                window.location.href = 'app-login.html';
+            } else {
+                alert("Erro ao cadastrar: " + (data.error || "Tente novamente."));
+            }
+
+        } catch (err) {
+            console.error("Erro no cadastro:", err);
+            alert("Não foi possível conectar ao servidor. Tente novamente em instantes.");
+        }
+    });
+</script>
+</body>
+</html>

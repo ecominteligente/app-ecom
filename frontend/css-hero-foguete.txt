@@ -1,0 +1,218 @@
+@media (min-width: 992px) {
+  #hero-foguete.hero-foguete {
+    min-height: 650px !important;
+    padding-top: 80px !important;
+  }
+  .hero-title-foguete {
+    font-size: 3.5rem !important;
+  }
+  .offset-lg-5 {
+    margin-left: 41.66666667%;
+  }
+}
+@media (max-width: 991px) {
+  .cta-container-foguete,
+  .hero-subtitle-foguete,
+  .hero-title-foguete {
+    text-align: center !important;
+  }
+  #hero-foguete.hero-foguete {
+    min-height: 480px !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    padding-bottom: 50px !important;
+  }
+  .hero-title-foguete {
+    font-size: 1.8rem !important;
+  }
+  .hero-subtitle-foguete {
+    margin: 0 auto 20px !important;
+  }
+  .offset-lg-5 {
+    margin-left: 0;
+  }
+}
+
+#hero-foguete,
+.hero-foguete {
+  position: relative;
+  z-index: 1;
+}
+.hero-bg-lcp,
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#hero-foguete.hero-foguete {
+  position: relative;
+  width: 100%;
+  min-height: 430px !important;
+  background-color: #061429;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  margin: 0 !important;
+}
+.hero-bg-lcp {
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1;
+  opacity: 1 !important;
+}
+.overlay {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+.hero-foguete .container {
+  position: relative;
+  z-index: 10;
+}
+.hero-title-foguete {
+  color: #22c55e !important;
+  font-family: Montserrat, sans-serif !important;
+  font-weight: 900 !important;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  margin-top: 0 !important;
+}
+.hero-subtitle-foguete {
+  color: #fff !important;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  max-width: 550px;
+}
+.hero-price-foguete {
+  margin-bottom: 20px;
+  font-family: Montserrat, sans-serif;
+}
+.old-price-foguete {
+  text-decoration: line-through;
+  color: #bbb;
+  margin-right: 8px;
+}
+.new-price-foguete {
+  color: #facc15;
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+.btn-hero-wa-foguete {
+  background-color: #25d366 !important;
+  color: #fff !important;
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.3s;
+  border: none;
+}
+.btn-hero-wa-foguete:hover {
+  background-color: #128c7e !important;
+  transform: translateY(-2px);
+}
+
+.hero-price-foguete {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.old-price-foguete {
+  font-size: 1.4rem;
+}
+.price-sep-foguete {
+  color: #fff;
+  margin-right: 15px;
+}
+.cta-container-foguete {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.btn-hero-wa-foguete {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  font-size: 1.1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+.hero-microcopy-foguete {
+  color: #fff;
+  margin-top: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  opacity: 1 !important;
+  width: 100%;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.hero-modelos {
+  min-height: 450px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+@media (max-width: 991px) {
+  .hero-foguete {
+    min-height: 400px !important;
+    height: 400px !important;
+    display: block !important;
+    background-position: 40% center !important;
+    text-align: center !important;
+    padding-top: 50px !important;
+  }
+  .hero-title-foguete {
+    font-size: 1.8rem !important;
+    margin-bottom: 5px !important;
+    width: 100%;
+  }
+  .hero-subtitle-foguete {
+    font-size: 0.95rem !important;
+    margin: 0 auto 15px !important;
+    max-width: 280px !important;
+    display: block;
+  }
+  .hero-price-foguete {
+    justify-content: center !important;
+    margin-bottom: 15px !important;
+    transform: scale(0.85);
+  }
+  .cta-container-foguete {
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100%;
+    display: flex;
+  }
+  .new-price-foguete {
+    font-size: 2.3rem !important;
+  }
+  .btn-hero-wa-foguete {
+    padding: 12px 30px !important;
+    font-size: 0.95rem !important;
+  }
+  .hero-modelos {
+    min-height: 350px !important;
+  }
+}
+
+.hero-foguete {
+  display: flex;
+  color: #fff;
+  width: 100%;
+}
+.hero-bg,
+.overlay {
+  position: absolute;
+  inset: 0;
+}
+.hero-bg {
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
+
+.btn-hero-wa-foguete,
+ text-transform: uppercase;
+}

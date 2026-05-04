@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecom Inteligente | Command Center</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg: #030712; --glass: rgba(31, 41, 55, 0.7); --accent: #0ea5e9; --success: #10b981; --danger: #ef4444; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); background-image: radial-gradient(circle at 50% -20%, #1e293b, #030712); color: #f8fafc; margin: 0; padding: 15px; overflow-x: hidden; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .status-badge { background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 8px; }
+        .pulse-dot { width: 8px; height: 8px; background-color: var(--success); border-radius: 50%; position: relative; }
+        .pulse-dot::before { content: ""; position: absolute; width: 100%; height: 100%; background-color: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
+        .uptime-panel { background: var(--glass); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 12px; margin-bottom: 20px; }
+        .uptime-bar { display: flex; gap: 3px; height: 14px; width: 100%; margin-top: 8px; }
+        .uptime-tick { flex: 1; background: var(--success); border-radius: 1px; opacity: 0.5; transition: 0.2s; cursor: help; }
+        .uptime-tick.down { background: var(--danger); opacity: 1; box-shadow: 0 0 5px var(--danger); }
+        .uptime-tick:hover { opacity: 1; transform: scaleY(1.3); }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .date-input { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 8px; outline: none; color-scheme: dark; font-size: 0.8rem; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .kpi-card { background: var(--glass); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .kpi-card h3 { font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; margin: 0; }
+        .kpi-card .val { font-size: 1.2rem; font-weight: 700; margin: 4px 0; display: block; }
+        .trend { font-size: 0.65rem; font-weight: bold; color: var(--success); }
+        .dashboard-content { display: flex; flex-wrap: wrap; gap: 15px; }
+        .card-main { flex: 1.6; min-width: 300px; background: var(--glass); padding: 15px; border-radius: 15px; height: 380px; display: flex; flex-direction: column; }
+        .card-side { flex: 1; min-width: 300px; background: var(--glass); padding: 15px; border-radius: 15px; height: 380px; display: flex; flex-direction: column; }
+        .chart-wrap { position: relative; flex-grow: 1; width: 100%; min-height: 0; }
+        .product-section { width: 100%; margin-top: 20px; background: var(--glass); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; font-size: 0.7rem; color: #94a3b8; padding-bottom: 8px; border-bottom: 1px solid #334155; }
+        td { padding: 10px 0; font-size: 0.8rem; border-bottom: 1px solid #1e293b; }
+        @media (max-width: 768px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .card-main, .card-side { flex: 1 1 100%; height: 320px; } }
+
+        /* Efeito de rotação para o ícone */
+.fa-spin {
+    animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estado de desativado para o botão */
+.btn-filter:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+}
+    </style>
+</head>
+<body>
+
+    <div class="header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <h2 id="boas-vindas" style="margin: 0; font-size: 1.2rem; color: #f8fafc;"></h2>
+        
+        <button onclick="window.location.href='app-meus-sites.html'" 
+                style="padding: 6px 12px; cursor: pointer; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 0.75rem; display: flex; align-items: center; gap: 5px; transition: 0.2s;">
+            <i class="fa-solid fa-layer-group"></i> Meus Sites
+        </button>
+
+        <button onclick="sair()" 
+                style="padding: 6px 12px; cursor: pointer; background: #ff4d4d; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 0.75rem; transition: 0.2s;">
+            Sair
+        </button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+        <h1 style="font-size: 1.1rem; margin:0; letter-spacing: 1px;">
+            ECOM | <span id="nome-site" style="color: var(--accent); font-weight: 800;">SISTEMA</span>
+        </h1>
+        <div class="status-badge">
+            <span class="pulse-dot"></span>
+            <span id="status-live">LIVE: MONITORANDO SITE</span>
+        </div>
+    </div>
+</div>
+
+    <div class="uptime-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color:var(--success); font-size: 0.7rem; font-weight: bold; text-transform: uppercase;">Estabilidade 24h</span>
+            <span style="font-size: 0.7rem; color: #94a3b8;">Status: <b style="color:var(--success)">Online</b></span>
+        </div>
+        <div class="uptime-bar" id="uptime-bar"></div>
+    </div>
+
+    <div class="filter-bar">
+        <input type="date" id="data-inicio" class="date-input">
+        <input type="date" id="data-fim" class="date-input">
+        <button onclick="loadData()" style="background: var(--accent); border:none; color:#fff; padding: 8px 15px; border-radius: 8px; cursor:pointer; font-weight: bold; font-size: 0.8rem;">FILTRAR</button>
+    </div>
+
+    <div class="kpi-grid">
+    <div class="kpi-card">
+        <h3>Faturamento</h3>
+        <span class="val" id="receita">R$ 0,00</span>
+        <span class="trend">Hoje</span>
+    </div>
+    
+    <div class="kpi-card">
+        <h3>Total Vendas</h3>
+        <span class="val" id="compras">0</span>
+        <span class="trend">Conversões</span>
+    </div>
+
+    <div class="kpi-card">
+        <h3>Conversão</h3>
+        <span class="val" id="conversao">0%</span>
+        <span class="trend" id="trend-conv" style="color:var(--success)">Tempo Real</span>
+    </div>
+    
+    <div class="kpi-card">
+    <h3>Conversão WhatsApp</h3>
+    <span class="val" id="rejeicao">0%</span>
+    <span class="trend" style="color:var(--success)">Leads gerados</span>
+</div>
+    
+    <div class="kpi-card">
+        <h3>Top Região</h3>
+        <span class="val" id="regiao" style="font-size: 1.2rem;">---</span>
+        <span class="trend">Localização</span>
+    </div>
+    
+    <div class="kpi-card">
+        <h3>Ticket Médio</h3>
+        <span class="val" id="ticket">R$ 0,00</span>
+        <span class="trend">Média</span>
+    </div>
+
+    <div class="kpi-card">
+        <h3>Online</h3>
+        <span class="val" id="online">0</span>
+        <span class="trend" style="color:var(--accent)">Ativos Agora</span>
+    </div>
+</div>
+
+    <div class="dashboard-content">
+        <div class="card-main">
+            <h4 style="margin:0 0 15px 0; color:var(--accent); font-size: 0.9rem;">Funil de Performance</h4>
+            <div class="chart-wrap"><canvas id="funnelChart"></canvas></div>
+        </div>
+        <div class="card-side">
+            <h4 style="margin:0 0 15px 0; color:var(--accent); font-size: 0.9rem;">Origem da Receita</h4>
+            <div class="chart-wrap"><canvas id="sourceChart"></canvas></div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+    
+    <div class="kpi-card" style="min-height: 350px;">
+        <h3>Vendas por Região</h3>
+        <div style="height: 280px; margin-top: 15px;">
+            <canvas id="regionChart"></canvas>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="min-height: 350px;">
+        <h3>Produtos Mais Vendidos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>PRODUTO</th>
+                    <th>VENDAS</th>
+                    <th>RECEITA</th>
+                </tr>
+            </thead>
+            <tbody id="top-produtos">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+ <script>
+let funnelChart, sourceChart, regionChart;
+
+const formatarMoeda = (v) => {
+    const n = parseFloat(v);
+    return isNaN(n) ? "R$ 0,00" : n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+};
+
+// 🔐 AUTH
+const token = localStorage.getItem('token');
+const userId = localStorage.getItem('userId');
+const nome = localStorage.getItem('usuarioNome');
+
+if (!token || !userId || userId === "null") {
+    window.location.href = 'app-login.html';
+}
+
+// 🟢 UPTIME
+function drawUptime(uptimeData) {
+    const bar = document.getElementById('uptime-bar');
+    if (!bar) return;
+
+    bar.innerHTML = '';
+    const dados = (uptimeData && uptimeData.length > 0) ? uptimeData : Array(60).fill('offline');
+
+    dados.forEach((status) => {
+        const tick = document.createElement('div');
+        tick.className = 'uptime-tick' + (status === 'offline' ? ' down' : '');
+        tick.title = status === 'offline' ? "Queda detectada" : "Sistema Online";
+        bar.appendChild(tick);
+    });
+}
+
+// 🚀 LOAD DATA
+async function loadData() {
+    const btn = document.querySelector('button[onclick="loadData()"]');
+    const originalHTML = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Filtrando...';
+
+    const siteId = localStorage.getItem('siteId') || '19';
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+
+    const url = `https://ecominteligente.com.br/api/kpis/${siteId}?inicio=${dataInicio}&fim=${dataFim}`;
+
+    try {
+        const res = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = res.ok ? await res.json() : {};
+
+        // 🧠 KPIs
+        document.getElementById('nome-site').innerText = data.nome_site || "—";
+        document.getElementById('compras').innerText = data.compras || 0;
+        document.getElementById('online').innerText = data.usuarios_ativos || 0;
+        document.getElementById('conversao').innerText = data.conversao || "0%";
+
+        document.getElementById('receita').innerText = formatarMoeda(data.receita || 0);
+        document.getElementById('ticket').innerText = formatarMoeda(data.ticket_medio || 0);
+        document.getElementById('regiao').innerText = data.top_regiao || "---";
+
+        // 🔥 FALTAVA ISSO
+        document.getElementById('rejeicao').innerText = data.ctr_whatsapp || "0%";
+
+        // 🔥 FALTAVA ISSO (PRODUTOS)
+        renderProdutos(data.top_produtos || []);
+
+        drawUptime(data.uptime);
+
+        initCharts(data);
+
+    } catch (e) {
+        console.error("❌ Erro ao carregar:", e);
+    } finally {
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+        }, 300);
+    }
+}
+
+// 📊 GRÁFICOS
+function initCharts(data) {
+
+    // 🔵 FUNIL
+    const fCtx = document.getElementById('funnelChart').getContext('2d');
+    if (funnelChart) funnelChart.destroy();
+
+    const fData = (data?.funnel?.length)
+        ? data.funnel
+        : [{ nome: 'Sem dados', qtd: 0 }];
+
+    funnelChart = new Chart(fCtx, {
+        type: 'bar',
+        data: {
+            labels: fData.map(i => i.nome),
+            datasets: [{
+                label: 'Volume',
+                data: fData.map(i => i.qtd),
+                backgroundColor: "#0ea5e9",
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // 🟡 ORIGEM (AGORA DINÂMICO)
+    const sCtx = document.getElementById('sourceChart').getContext('2d');
+    if (sourceChart) sourceChart.destroy();
+
+    const origemData = (data?.origens?.length === 3)
+        ? data.origens
+        : [0, 0, 0];
+
+    sourceChart = new Chart(sCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Ads', 'Org', 'Soc'],
+            datasets: [{
+                data: origemData,
+                backgroundColor: ['#0ea5e9', '#10b981', '#f59e0b'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%'
+        }
+    });
+
+    // 🟣 REGIÕES
+    const rCtx = document.getElementById('regionChart').getContext('2d');
+    if (regionChart) regionChart.destroy();
+
+    const rData = (data?.regioes?.length)
+        ? data.regioes
+        : [{ estado: 'Sem dados', valor: 0 }];
+
+    regionChart = new Chart(rCtx, {
+        type: 'bar',
+        data: {
+            labels: rData.map(i => i.estado),
+            datasets: [{
+                data: rData.map(i => i.valor),
+                backgroundColor: "#0ea5e9",
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+// 📦 PRODUTOS
+function renderProdutos(produtos) {
+    const tbody = document.getElementById('top-produtos');
+    if (!tbody) return;
+
+    const dados = produtos || [];
+
+    tbody.innerHTML = dados.map(p => `
+        <tr>
+            <td>${p.nome}</td>
+            <td>${p.vendas}</td>
+            <td>${formatarMoeda(p.receita)}</td>
+        </tr>
+    `).join('');
+}
+
+// 🚪 LOGOUT
+function sair() {
+    localStorage.clear();
+    window.location.href = 'app-login.html';
+}
+
+// 🚀 INIT
+window.onload = () => {
+    document.getElementById('boas-vindas').innerText = `Olá, ${nome}!`;
+
+    const hoje = new Date().toISOString().split('T')[0];
+    const inputInicio = document.getElementById('data-inicio');
+    const inputFim = document.getElementById('data-fim');
+
+    if (!inputInicio.value) inputInicio.value = hoje;
+    if (!inputFim.value) inputFim.value = hoje;
+
+    loadData();
+};
+</script>
+
+
+</body>
+</html>

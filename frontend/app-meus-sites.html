@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Sites - Ecom Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #030712;
+            --card: rgba(17, 24, 39, 0.7);
+            --accent: #0066ff;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            background-image: 
+                radial-gradient(circle at top right, rgba(14, 165, 233, 0.1), transparent),
+                radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.05), transparent);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .brand { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+        .brand span { color: var(--accent); }
+
+        .btn-add {
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add:hover { 
+            transform: translateY(-2px); 
+            background: #0284c7;
+            box-shadow: 0 20px 25px -5px rgba(14, 165, 233, 0.4);
+        }
+
+        /* BARRA DE STATUS DO PLANO */
+        .plan-status-card {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+        }
+
+        .plan-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        #texto-limite { font-size: 14px; font-weight: 700; color: var(--text); }
+        
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            height: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #barra-progresso {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #38bdf8);
+            border-radius: 20px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+        }
+
+        /* AVISO DE TRIAL */
+        #aviso-trial {
+            width: 100%;
+            max-width: 1000px;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 25px;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } }
+
+        /* GRID DE SITES */
+        .grid-sites {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .site-card {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .site-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-8px);
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .site-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(14, 165, 233, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .site-card h3 { font-size: 20px; font-weight: 800; color: #fff; }
+        .site-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 10px; }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border-radius: 50px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            width: fit-content;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        #loading { color: var(--text-muted); font-weight: 600; margin-top: 60px; }
+
+        /* FOOTER */
+        footer {
+            margin-top: auto;
+            padding: 60px 0 30px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            width: 100%;
+        }
+
+        /* RESPONSIVO */
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 20px; text-align: center; }
+            .grid-sites { grid-template-columns: 1fr; }
+            .plan-info { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="brand">Ecom <span>Inteligente</span></div>
+        <a href="app-configurar-site.html" class="btn-add"><i class="fa-solid fa-plus"></i> Novo Site</a>
+    </div>
+
+    <div id="aviso-trial" style="display:none;">
+        <i class="fa-solid fa-clock"></i> <span id="mensagem-trial"></span>
+        <a href="app-assinatura.html" style="margin-left: 10px; color: white; text-decoration: underline;">Upgrade Agora</a>
+    </div>
+
+    <div class="plan-status-card" id="status-plano">
+        <div class="plan-info">
+            <span id="texto-limite"><i class="fa-solid fa-layer-group"></i> Carregando seu plano...</span>
+            <span style="font-size: 12px; color: var(--text-muted);">Capacidade de monitoramento</span>
+        </div>
+        <div class="progress-container">
+            <div id="barra-progresso" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <div id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Sincronizando seus sites...</div>
+    
+    <div class="grid-sites" id="grid-sites">
+        </div>
+
+    <footer>
+        &copy; 2026 Ecom Inteligente - Tecnologia em Gestão de Performance
+    </footer>
+
+    <script>
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    // Proteção: se não tiver logado, volta pro login
+    if (!token || !userId || userId === "null") {
+        window.location.href = 'app-login.html';
+    }
+
+    async function carregarPainel() {
+        try {
+            // 1. BUSCAR STATUS DO TRIAL E PLANO (Atualizado para o seu domínio)
+            const resStatus = await fetch(`https://ecominteligente.com.br/api/user/status/${userId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const status = await resStatus.json();
+
+            const avisoTrial = document.getElementById('aviso-trial');
+            const msgTrial = document.getElementById('mensagem-trial');
+            const btnAdd = document.querySelector('.btn-add');
+
+            // Lógica Visual do Trial
+            if (status.plano === "PRO") {
+                if(avisoTrial) avisoTrial.style.display = 'none';
+            } else {
+                if(avisoTrial) avisoTrial.style.display = 'block';
+                if (status.expirado) {
+                    avisoTrial.style.background = 'rgba(220, 38, 38, 0.2)'; 
+                    avisoTrial.style.border = '1px solid #ef4444';
+                    avisoTrial.style.color = '#f87171';
+                    msgTrial.innerText = "🚨 Seu período de teste terminou! Assine para continuar.";
+                    if(btnAdd) {
+                        btnAdd.style.pointerEvents = 'none';
+                        btnAdd.style.opacity = '0.5';
+                    }
+                } else {
+                    const cor = status.dias_restantes <= 2 ? '#fbbf24' : '#34d399';
+                    const bg = status.dias_restantes <= 2 ? 'rgba(217, 119, 6, 0.2)' : 'rgba(5, 150, 105, 0.15)';
+                    avisoTrial.style.background = bg;
+                    avisoTrial.style.color = cor;
+                    avisoTrial.style.border = `1px solid ${cor}`;
+                    msgTrial.innerText = `⏳ Período de Teste: ${status.dias_restantes} dias restantes.`;
+                }
+            }
+
+            // 2. BUSCAR SITES (Atualizado para a rota correta da Ecom Inteligente)
+            const resSites = await fetch(`https://ecominteligente.com.br/api/sites/user/${userId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const sites = await resSites.json();
+
+            const loadingEl = document.getElementById('loading');
+            if(loadingEl) loadingEl.style.display = 'none';
+            
+            const grid = document.getElementById('grid-sites');
+
+            // Definindo limite baseado no plano
+            const limite = status.plano === "PRO" ? 99 : 3;
+            const total = sites.length;
+            const porcentagem = Math.min((total / limite) * 100, 100);
+
+            const textoLimite = document.getElementById('texto-limite');
+            const barraProgresso = document.getElementById('barra-progresso');
+
+            if (textoLimite && barraProgresso) {
+                textoLimite.innerText = status.plano === "PRO" 
+                    ? `Plano PRO: ${total} sites ativos`
+                    : `Você está usando ${total} de ${limite} sites do seu Plano Free`;
+                
+                barraProgresso.style.width = `${porcentagem}%`;
+
+                if ((status.plano !== "PRO" && total >= limite) || status.expirado) {
+                    barraProgresso.style.background = '#f59e0b';
+                    if (btnAdd) {
+                        btnAdd.style.opacity = '0.5';
+                        btnAdd.style.pointerEvents = 'none';
+                    }
+                } else {
+                    barraProgresso.style.background = 'var(--accent)';
+                    if (btnAdd) {
+                        btnAdd.style.opacity = '1';
+                        btnAdd.style.pointerEvents = 'auto';
+                    }
+                }
+            }
+
+            // 3. RENDERIZAR CARDS
+            if (sites.length === 0) {
+                grid.innerHTML = '<p style="color: #94a3b8; text-align: center; width: 100%;">Nenhum site cadastrado ainda.</p>';
+                return;
+            }
+
+            grid.innerHTML = sites.map(site => `
+                <div class="site-card" style="position: relative;">
+                    <div onclick="acessarDashboard(${site.id})" style="cursor:pointer;">
+                        <h3>${site.name}</h3>
+                        <p>${site.url}</p>
+                        <div class="status">Monitorando</div>
+                    </div>
+
+                    <button onclick="editarSite(${site.id})" 
+                            title="Editar Configurações"
+                            style="position: absolute; top: 15px; right: 55px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1.1rem;">
+                        ✏️
+                    </button>
+
+                    <button onclick="deletarSite(event, ${site.id})" 
+                            title="Remover Site"
+                            style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #f87171; cursor: pointer; font-size: 1.1rem;">
+                        🗑️
+                    </button>
+                </div>
+            `).join('');
+
+        } catch (err) {
+            console.error("❌ Erro ao carregar painel:", err);
+            const loadingMsg = document.getElementById('loading');
+            if(loadingMsg) loadingMsg.innerText = 'Erro ao conectar com o servidor.';
+        }
+    }
+
+    function acessarDashboard(id) {
+        localStorage.setItem('siteId', id);
+        window.location.href = 'app-dashboard.html';
+    }
+
+    function editarSite(id) {
+        window.location.href = `app-configurar-site.html?id=${id}`;
+    }
+
+    async function deletarSite(event, id) {
+        event.stopPropagation();
+        if (!confirm("Deseja realmente remover este site?")) return;
+        try {
+            // Atualizado para o seu domínio na Hostinger
+            const res = await fetch(`https://ecominteligente.com.br/api/sites/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                carregarPainel();
+            } else {
+                alert("Erro ao excluir o site.");
+            }
+        } catch (err) {
+            console.error("Erro ao excluir:", err);
+            alert("Erro de conexão ao excluir.");
+        }
+    }
+
+    carregarPainel();
+</script>
+</body>
+</html>

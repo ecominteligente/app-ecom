@@ -1,0 +1,71 @@
+# ----------------------------------------------------------------------
+# CONFIGURAÇÕES DE COMPATIBILIDADE E SEGURANÇA
+# ----------------------------------------------------------------------
+<IfModule mod_mime.c>
+    AddType image/webp .webp
+    AddType image/jpeg .jpg .jpeg
+    AddType image/png .png
+</IfModule>
+
+# ----------------------------------------------------------------------
+# MOTOR DE REDIRECIONAMENTO
+# ----------------------------------------------------------------------
+RewriteEngine On
+
+# 1. EXCEÇÃO PARA REDES SOCIAIS (Resolve o erro 403 no Debugger)
+# Se for o Facebook ou WhatsApp pedindo imagens, o servidor libera o acesso direto
+RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|WhatsApp|Twitterbot|Pinterest) [NC]
+RewriteRule ^assets/img/ - [L]
+
+# 2. Forçar HTTPS e remover WWW
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\.ecominteligente\.com\.br$ [NC]
+RewriteRule ^(.*)$ https://ecominteligente.com.br/$1 [L,R=301]
+
+# 3. Desativar MultiViews e Indexes
+Options -MultiViews -Indexes
+
+# 4. Redirecionar index.html para a raiz (Evita conteúdo duplicado)
+RewriteCond %{THE_REQUEST} \s/index\.html\s [NC]
+RewriteRule ^index\.html$ https://ecominteligente.com.br/ [L,R=301]
+
+# ----------------------------------------------------------------------
+# 5. REDIRECIONAMENTOS ESPECÍFICOS (BLOG E SERVIÇOS)
+# ----------------------------------------------------------------------
+
+# Blog
+RewriteRule ^artigo1$ /estrategias-para-aumentar-vendas-online [R=301,L]
+RewriteRule ^artigo2$ /poder-das-landing-pages [R=301,L]
+RewriteRule ^artigo3$ /guia-seo-para-iniciantes [R=301,L]
+RewriteRule ^artigo4$ /guia-completo-google-ads [R=301,L]
+RewriteRule ^artigo5$ /ia-no-marketing-digital [R=301,L]
+RewriteRule ^ferramentas-gratuitas-google-negocios$ /ferramentas-gratuitas-google [R=301,L]
+RewriteRule ^blog/estrategias-para-aumentar-vendas-online$ /estrategias-para-aumentar-vendas-online [R=301,L]
+
+# SERVIÇOS ANTIGOS -> NOVOS
+RewriteRule ^service-dev$ /desenvolvimento-web [R=301,L]
+RewriteRule ^service-e-commerce$ /criacao-de-ecommerce [R=301,L]
+RewriteRule ^service-google-tools$ /configuracao-ga4-gtm [R=301,L]
+RewriteRule ^service-landing$ /criacao-de-landing-pages [R=301,L]
+RewriteRule ^service-seo$ /seo-busca-organica [R=301,L]
+RewriteRule ^service-trafego-pago$ /agencia-trafego-pago [R=301,L]
+
+# REDIRECT MARKETPLACE (Páginas removidas)
+RewriteRule ^preco-integracao-marketplace$ /preco-ecommerce [R=301,L]
+
+# ----------------------------------------------------------------------
+# 6. URLs SEM .HTML (Mecanismo Corrigido)
+# ----------------------------------------------------------------------
+
+# Se o arquivo físico ou pasta existir (como /assets/img/og.jpg), para aqui e entrega o arquivo
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Se o usuário acessar /pagina.html, redireciona para /pagina (URL limpa)
+RewriteCond %{THE_REQUEST} \s/([^.]+)\.html\s [NC]
+RewriteRule ^([^.]+)\.html$ https://ecominteligente.com.br/$1 [R=301,L]
+
+# Se a URL não tem extensão e o arquivo .html existe, serve o conteúdo por trás
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.+)$ $1.html [L]

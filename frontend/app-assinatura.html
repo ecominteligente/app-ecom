@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assinatura | Ecom Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-green: #00ff88; /* Verde bem aceso/elétrico */
+            --bg-dark: #05060a;
+            --card-bg: #0f121a;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --ga4-blue: #4285f4;
+            --ga4-orange: #ff9900;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
+
+        header {
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 6, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: var(--border);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        .logo { font-size: 24px; font-weight: 800; text-decoration: none; color: #fff; }
+        .logo span { color: var(--primary-green); }
+
+        /* --- HERO --- */
+        .hero {
+            padding: 160px 8% 40px;
+            text-align: center;
+            background: radial-gradient(circle at top, rgba(0, 255, 136, 0.1), transparent 70%);
+        }
+        .hero h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 800; margin-bottom: 15px; }
+        .hero h1 span { color: var(--primary-green); }
+        .hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto; }
+
+        /* --- CARDS DE PREÇO (NO TOPO) --- */
+        .pricing { padding: 40px 8%; }
+        .pricing-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 25px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+
+        .plan {
+            background: var(--card-bg);
+            padding: 45px 35px;
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            transition: 0.4s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .plan.featured {
+            border-color: var(--primary-green);
+            background: linear-gradient(180deg, rgba(0, 255, 136, 0.05) 0%, #0f121a 100%);
+            transform: scale(1.05);
+            z-index: 2;
+            box-shadow: 0 25px 50px rgba(0, 255, 136, 0.1);
+        }
+
+        .plan h4 { color: var(--primary-green); font-size: 13px; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; }
+        .plan .price { font-size: 44px; font-weight: 800; margin-bottom: 30px; }
+        .plan .price span { font-size: 16px; color: var(--text-muted); }
+
+        .plan-list { list-style: none; margin-bottom: 40px; flex-grow: 1; }
+        .plan-list li { margin-bottom: 15px; font-size: 14px; color: #cbd5e1; display: flex; align-items: center; }
+        .plan-list li::before { content: "✓"; color: var(--primary-green); margin-right: 12px; font-weight: 900; }
+
+        .btn-plan {
+            padding: 18px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 800;
+            border-radius: 14px;
+            background: var(--primary-green);
+            color: #05060a; /* Texto escuro para contraste com verde claro */
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
+        }
+        .btn-plan:hover { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 15px 30px rgba(0, 255, 136, 0.4); }
+
+        /* --- GRÁFICOS (ABAIXO DOS CARDS) --- */
+        .monitor-section {
+            max-width: 1200px;
+            margin: 80px auto;
+            background: #0f121a;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 40px;
+        }
+
+        .monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .pulse-dot {
+            width: 10px; height: 10px; background: var(--primary-green); border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .live-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 200px;
+            gap: 10px;
+        }
+
+        .bar-pair {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 100%;
+        }
+
+        .bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            min-height: 10px;
+            animation: grow 1.5s ease-out forwards;
+        }
+
+        .bar.blue { background: var(--ga4-blue); }
+        .bar.orange { background: var(--ga4-orange); }
+
+        @keyframes grow { from { height: 0; } to { height: var(--h); } }
+        @keyframes pulse {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.5); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(0, 255, 136, 0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+        }
+
+        @media (max-width: 992px) {
+            .pricing-grid { grid-template-columns: 1fr; max-width: 450px; }
+            .plan.featured { transform: none; }
+            .monitor-section { margin: 40px 20px; padding: 20px; }
+        }
+
+        .infographic-box {
+        max-width: 1200px;
+        margin: 60px auto;
+        background: #0f121a;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        padding: 40px;
+    }
+    .grid-infographic {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        text-align: center;
+    }
+    .circle-chart {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        background: conic-gradient(var(--p-color) var(--p-val), #1e293b 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .circle-chart::after {
+        content: attr(data-text);
+        width: 100px;
+        height: 100px;
+        background: #0f121a;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 18px;
+    }
+
+    
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="/" class="logo">Ecom <span>Inteligente</span></a>
+    <div style="font-size: 12px; font-weight: 800; color: var(--primary-green);">SISTEMA ATIVO</div>
+</header>
+
+<section class="hero">
+    <h1>Escolha seu Plano de <span>Continuidade</span></h1>
+    <p>Sua licença atual está prestes a expirar. Selecione um plano para manter seus dados fluindo em tempo real.</p>
+</section>
+
+<section class="pricing">
+    <div class="pricing-grid">
+        <div class="plan">
+            <h4>Start Business</h4>
+            <div class="price">R$ 59<span>/mês</span></div>
+            <ul class="plan-list">
+                <li>1 Site Monitorado</li>
+                <li>Dashboards Essenciais</li>
+                <li>KPIs de Vendas</li>
+                <li>Suporte E-mail</li>
+            </ul>
+            <a href="https://buy.stripe.com/test_dRm3cx1N44E29FY7eA8bS00" class="btn-plan">Assinar Agora</a>
+        </div>
+
+        <div class="plan featured">
+            <div style="background: var(--primary-green); color: #000; font-size: 10px; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 15px; font-weight: 800;">MAIS ESCOLHIDO</div>
+            <h4>Pro Performance</h4>
+            <div class="price">R$ 147<span>/mês</span></div>
+            <ul class="plan-list">
+                <li>Até 3 Sites Ativos</li>
+                <li>Relatórios Customizados</li>
+                <li>Tracking de ROI Real</li>
+                <li>Suporte WhatsApp VIP</li>
+            </ul>
+            <a href="https://buy.stripe.com/test_00w9AVezQ5I6dWegPa8bS01" class="btn-plan">Ativar Upgrade</a>
+        </div>
+
+        <div class="plan">
+            <h4>Expansion</h4>
+            <div class="price">R$ 247<span>/mês</span></div>
+            <ul class="plan-list">
+                <li>Até 5 Sites Ativos</li>
+                <li>API de Integração</li>
+                <li>Análise de Performance</li>
+                <li>Gerente de Conta</li>
+            </ul>
+            <a href="https://buy.stripe.com/test_5kQ9AVajA2vUaK2cyU8bS02" class="btn-plan">Assinar Agora</a>
+        </div>
+    </div>
+
+    <div class="monitor-section">
+        <div class="monitor-header">
+            <div class="status-badge">
+                <div class="pulse-dot"></div>
+                MONITORAMENTO EM TEMPO REAL (GA4)
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted);">Sincronizando com ecominteligente.com.br...</div>
+        </div>
+
+        <div class="infographic-box">
+    <div class="monitor-header" style="margin-bottom: 40px;">
+        <div class="status-badge">
+            <div class="pulse-dot"></div> MONITORAMENTO GLOBAL ATIVO
+        </div>
+    </div>
+
+    <div class="grid-infographic">
+        <div>
+            <div class="circle-chart" style="--p-color: #4285f4; --p-val: 56%;" data-text="56%"></div>
+            <p style="font-size: 11px; color: var(--text-muted); font-weight: 700;">VISITAS WEB</p>
+        </div>
+        <div>
+            <div class="circle-chart" style="--p-color: #a855f7; --p-val: 33%;" data-text="33%"></div>
+            <p style="font-size: 11px; color: var(--text-muted); font-weight: 700;">CONVERSÃO</p>
+        </div>
+        <div>
+            <div class="circle-chart" style="--p-color: var(--primary-green); --p-val: 80%;" data-text="80%"></div>
+            <p style="font-size: 11px; color: var(--text-muted); font-weight: 700;">ESTABILIDADE</p>
+        </div>
+    </div>
+
+    <div class="live-chart" style="margin-top: 50px; height: 150px;">
+        <div class="bar-pair"><div class="bar" style="--h: 30%; background: #4285f4;"></div><div class="bar" style="--h: 60%; background: #f9ab00;"></div></div>
+        <div class="bar-pair"><div class="bar" style="--h: 80%; background: #4285f4;"></div><div class="bar" style="--h: 40%; background: #f9ab00;"></div></div>
+        <div class="bar-pair"><div class="bar" style="--h: 50%; background: #4285f4;"></div><div class="bar" style="--h: 90%; background: #f9ab00;"></div></div>
+        <div class="bar-pair"><div class="bar" style="--h: 95%; background: #4285f4;"></div><div class="bar" style="--h: 70%; background: #f9ab00;"></div></div>
+    </div>
+</div>
+</section>
+
+<footer style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 12px; border-top: var(--border);">
+    &copy; 2026 Ecom Inteligente - Tecnologia de Precisão.
+</footer>
+
+</body>
+</html>
