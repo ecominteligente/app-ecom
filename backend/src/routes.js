@@ -500,7 +500,8 @@ router.put('/sites/update/:id', async (req, res) => {
             id
         ];
 
-        const [result] = await pool.query(
+        /*
+const [result] = await pool.query(
     "INSERT INTO users (name, email, password, trial_ends) VALUES (?, ?, ?, ?)",
     [nome, email, senhaCripto, trialEnds]
 );
@@ -508,11 +509,16 @@ router.put('/sites/update/:id', async (req, res) => {
 res.status(201).json({ 
     message: "Usuário criado!", 
     user: { 
-        id: result.insertId, // No MySQL usamos insertId
+        id: result.insertId,
         name: nome, 
         email: email 
     } 
 });
+*/
+
+await pool.query(query, values);
+
+res.json({ message: "Site atualizado!" });
 
     } catch (err) {
         // Logamos apenas a MENSAGEM do erro no console para não travar o log
