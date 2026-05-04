@@ -4,7 +4,7 @@ require("dotenv").config();
 const cron = require("node-cron");
 const axios = require("axios");
 
-// 🔧 Proteção do banco (não deixa o app cair)
+// 🔧 Proteção do banco
 let pool;
 try {
   pool = require("./db");
@@ -12,14 +12,12 @@ try {
   console.error("❌ Erro ao conectar banco:", e.message);
 }
 
+// Importa a configuração que acabamos de ajustar acima
 const app = require("./app");
 
 const port = process.env.PORT || 3000;
 
-// ✅ Rota de teste (garante que o servidor responde)
-app.get("/", (req, res) => {
-  res.send("Servidor rodando");
-});
+// ✅ A rota de teste "/" foi removida daqui para não atropelar o frontend.
 
 // 2. FUNÇÃO DO VIGILANTE
 async function rodarVigilante() {
@@ -35,7 +33,6 @@ async function rodarVigilante() {
 
     for (let site of rows) {
       let status = "offline";
-
       try {
         const response = await axios.get(site.url, { timeout: 5000 });
         if (response.status === 200) status = "online";
@@ -53,19 +50,11 @@ async function rodarVigilante() {
         [site.id, status]
       );
     }
-
     console.log("✅ [SISTEMA] Verificação concluída!");
   } catch (err) {
     console.error("❌ [ERRO] Vigilante:", err.message);
   }
 }
-
-// 🔴 DESATIVADO TEMPORARIAMENTE (para não derrubar o servidor)
-// cron.schedule('* * * * *', () => {
-//   rodarVigilante();
-// });
-
-// rodarVigilante();
 
 // 5. INICIALIZAÇÃO DO SERVIDOR
 app.listen(port, () => {

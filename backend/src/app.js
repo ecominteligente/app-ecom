@@ -4,18 +4,29 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-// const routes = require("./routes"); // desativado por enquanto
-
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// rota de teste
+// 1. Define o caminho subindo dois níveis (de src -> backend -> raiz)
+// para encontrar a pasta frontend vizinha
+const frontendPath = path.resolve(__dirname, '..', '..', 'frontend');
+
+// 2. Serve os arquivos estáticos (CSS, JS, Imagens)
+app.use(express.static(frontendPath));
+
+// 3. Rota principal: Entrega o index.html da ECOM Inteligente
 app.get("/", (req, res) => {
-  res.send("APP OK");
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// app.use("/api", routes); // desativado por enquanto
+// 4. Rota catch-all para manter a navegação funcional
+app.get("*", (req, res) => {
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ message: "Rota API não encontrada" });
+    }
+    res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 module.exports = app;
