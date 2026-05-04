@@ -4,7 +4,7 @@ require("dotenv").config();
 const cron = require("node-cron");
 const axios = require("axios");
 
-// 🔧 Proteção do banco (não deixa o app cair)
+// 🔧 Proteção do banco
 let pool;
 try {
   pool = require("./db");
@@ -15,15 +15,6 @@ try {
 const app = require("./app");
 
 const port = process.env.PORT || 3000;
-
-// ===============================
-// 🔥 SERVIR FRONTEND (CORREÇÃO)
-// ===============================
-app.use(express.static(path.join(__dirname, "../../frontend")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/index.html"));
-});
 
 // ===============================
 // 🕒 VIGILANTE (mantido igual)
@@ -66,18 +57,7 @@ async function rodarVigilante() {
   }
 }
 
-// 🔴 DESATIVADO TEMPORARIAMENTE
-// cron.schedule('* * * * *', () => {
-//   rodarVigilante();
-// });
-
-// rodarVigilante();
-
-// ===============================
-// 🚀 INICIAR SERVIDOR
-// ===============================
+// 🚀 iniciar servidor
 app.listen(port, () => {
   console.log(`🚀 Servidor rodando na porta ${port}`);
-}).on('error', (err) => {
-  console.error("❌ Erro ao iniciar:", err.message);
 });
