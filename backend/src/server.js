@@ -16,12 +16,18 @@ const app = require("./app");
 
 const port = process.env.PORT || 3000;
 
-// ✅ Rota de teste (garante que o servidor responde)
+// ===============================
+// 🔥 SERVIR FRONTEND (CORREÇÃO)
+// ===============================
+app.use(express.static(path.join(__dirname, "../../frontend")));
+
 app.get("/", (req, res) => {
-  res.send("Servidor rodando");
+  res.sendFile(path.join(__dirname, "../../frontend/index.html"));
 });
 
-// 2. FUNÇÃO DO VIGILANTE
+// ===============================
+// 🕒 VIGILANTE (mantido igual)
+// ===============================
 async function rodarVigilante() {
   console.log("🕒 [SISTEMA] Iniciando verificação automática...");
   
@@ -60,14 +66,16 @@ async function rodarVigilante() {
   }
 }
 
-// 🔴 DESATIVADO TEMPORARIAMENTE (para não derrubar o servidor)
+// 🔴 DESATIVADO TEMPORARIAMENTE
 // cron.schedule('* * * * *', () => {
 //   rodarVigilante();
 // });
 
 // rodarVigilante();
 
-// 5. INICIALIZAÇÃO DO SERVIDOR
+// ===============================
+// 🚀 INICIAR SERVIDOR
+// ===============================
 app.listen(port, () => {
   console.log(`🚀 Servidor rodando na porta ${port}`);
 }).on('error', (err) => {
