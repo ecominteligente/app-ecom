@@ -1,21 +1,21 @@
-// src/app.js
 const path = require('path');
-// Ajuste para o .env na pasta pai
-require("dotenv").config({ path: path.join(__dirname, "../.env") });
+require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const routes = require("./routes");
+
+// const routes = require("./routes"); // desativado por enquanto
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// 🚀 ESSENCIAL: Faz o Express enxergar seus arquivos HTML na public_html
-app.use(express.static(path.join(__dirname, "../public")));
+// rota de teste
+app.get("/", (req, res) => {
+  res.send("APP OK");
+});
 
-// Prefixo /api para todas as rotas (conforme configuramos nos HTMLs)
-app.use("/api", routes);
+// app.use("/api", routes); // desativado por enquanto
 
 module.exports = app;
