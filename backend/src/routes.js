@@ -13,9 +13,9 @@ const getStripe = () => {
 };
 
 // GA4
-// const analyticsClient = new BetaAnalyticsDataClient({
-//     keyFilename: './google-credentials.json',
-// });
+const analyticsClient = new BetaAnalyticsDataClient({
+    keyFilename: './google-credentials.json',
+});
 
 
 // ================= LOGIN =================
