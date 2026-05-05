@@ -169,7 +169,20 @@ router.post("/sites/add", async (req, res) => {
 router.get("/sites/user/:userId", async (req, res) => {
     try {
         const [rows] = await pool.query(
-            "SELECT id, name, url, status FROM sites WHERE user_id = ? ORDER BY id DESC",
+            `SELECT 
+                id,
+                name,
+                url,
+                status,
+                ga4_property_id,
+                event_whatsapp,
+                event_purchase,
+                event_checkout,
+                event_cart,
+                event_lead
+            FROM sites 
+            WHERE user_id = ? 
+            ORDER BY id DESC`,
             [req.params.userId]
         );
 
