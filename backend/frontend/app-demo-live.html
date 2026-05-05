@@ -192,6 +192,24 @@
             .mockup-grid { grid-template-columns: 1fr; }
             .plan.featured { transform: none; }
         }
+
+        /* Aviso de Cartão de Crédito */
+.no-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+.no-card svg {
+    width: 14px;
+    height: 14px;
+    color: var(--success);
+}
     </style>
 </head>
 <body>
@@ -208,8 +226,15 @@
 <section class="hero">
     <h1>Gestão por Dados e <span>Alta Performance.</span></h1>
     <p>Pare de perder dinheiro com achismos. Visualize a saúde real do seu e-commerce em tempo real com nossa tecnologia de rastreamento avançado.</p>
-    <a href="#planos" class="btn-login" style="padding: 18px 48px; font-size: 16px;">Começar Teste Grátis</a>
-</section>
+    
+    <div style="display: inline-block;">
+        <a href="#planos" class="btn-login" style="padding: 18px 48px; font-size: 16px;">Começar Teste Grátis</a>
+        <div class="no-card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Não precisa de cartão de crédito
+        </div>
+    </div>
+</section>>
 
 <section class="dashboard-preview">
     <div class="mockup-container">
@@ -280,6 +305,9 @@
                 </ul>
             </div>
             <a href="app-registrar.html?plano=price_1TGR7URplau9uu4H5ng69HM8" class="btn-plan primary">7 Dias Grátis</a>
+            <div class="no-card" style="font-size: 10px; margin-top: 10px;">
+        🔒 Sem cartão de crédito
+    </div>
         </div>
 
         <div class="plan">
@@ -294,6 +322,9 @@
                 </ul>
             </div>
             <a href="app-registrar.html?plano=price_1TGRayRplau9uu4Hq0LE58ey" class="btn-plan primary">7 Dias Grátis</a>
+            <div class="no-card" style="font-size: 10px; margin-top: 10px;">
+        🔒 Sem cartão de crédito
+    </div>
         </div>
 
         <div class="plan featured">
@@ -309,6 +340,9 @@
                 </ul>
             </div>
             <a href="app-registrar.html?plano=price_1TGRdvRplau9uu4HyKAkT4rg" class="btn-plan primary">Assinar Plano Pro</a>
+            <div class="no-card" style="font-size: 10px; margin-top: 10px;">
+        🔒 Sem cartão de crédito
+    </div>
         </div>
 
         <div class="plan">

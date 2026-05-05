@@ -120,20 +120,24 @@ router.post("/create-checkout-session", async (req, res) => {
 router.post("/auth/register", async (req, res) => {
     try {
         const { nome, email, senha } = req.body;
+        
+        // 1. Criptografia da senha
         const salt = await bcrypt.genSalt(10);
         const senhaCripto = await bcrypt.hash(senha, salt);
         
+        // 2. Configuração do Trial de 7 dias
         const trialEnds = new Date();
         trialEnds.setDate(trialEnds.getDate() + 7);
 
-        // Ajustado: Trocamos os $ pelo ? e removemos o RETURNING (que não existe no MySQL)
+        // 3. Inserção no MySQL usando o padrão de interrogação (?)
         const [result] = await pool.query(
             "INSERT INTO users (name, email, password, trial_ends) VALUES (?, ?, ?, ?)",
             [nome, email, senhaCripto, trialEnds]
         );
 
-        // Ajustado: No MySQL, usamos result.insertId para saber o ID do usuário que acabou de ser criado
-        res.status(201).json({ 
+        // 4. Retorno de Sucesso (Usando insertId do MySQL)
+        // O return garante que a execução pare aqui em caso de sucesso
+        return res.status(201).json({ 
             message: "Usuário criado!", 
             user: { 
                 id: result.insertId, 
@@ -141,9 +145,18 @@ router.post("/auth/register", async (req, res) => {
                 email: email 
             } 
         });
+
     } catch (err) {
         console.error("Erro ao cadastrar:", err.message);
-        res.status(500).json({ error: "Erro ao cadastrar: " + err.message });
+
+        // 🔥 TRATA EMAIL DUPLICADO (ER_DUP_ENTRY é específico do MySQL)
+        // O return aqui é CRUCIAL para não enviar duas respostas
+        if (err.code === "ER_DUP_ENTRY") {
+            return res.status(400).json({ error: "E-mail já cadastrado." });
+        }
+
+        // Caso seja qualquer outro erro técnico
+        return res.status(500).json({ error: "Erro interno no servidor." });
     }
 });
 

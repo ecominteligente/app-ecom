@@ -112,12 +112,21 @@
 
     // Mostrar um aviso visual se houver plano selecionado
     if (planoEscolhido) {
-        const infoPlano = document.getElementById('info-plano');
-        if (infoPlano) {
-            infoPlano.innerText = "Você selecionou um plano. Seu teste de 7 dias começa agora!";
-            infoPlano.style.color = "#34d399";
-        }
+    const infoPlano = document.getElementById('info-plano');
+    if (infoPlano) {
+        // Mensagem atualizada para remover a objeção do cartão de crédito
+        infoPlano.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Plano selecionado! <strong>Teste de 7 dias liberado sem cartão.</strong></span>
+            </div>
+        `;
+        infoPlano.style.color = "#34d399";
+        infoPlano.style.fontWeight = "600";
     }
+}
 
     // 2. LÓGICA DE CADASTRO
     document.getElementById('form-register').addEventListener('submit', async (e) => {
