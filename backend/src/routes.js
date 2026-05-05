@@ -13,8 +13,10 @@ const getStripe = () => {
 };
 
 // GA4
+const path = require('path');
+
 const analyticsClient = new BetaAnalyticsDataClient({
-    keyFilename: './google-credentials.json',
+    keyFilename: path.join(__dirname, '../google-credentials.json'),
 });
 
 
