@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("./db");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { BetaAnalyticsDataClient } = require('@google-analytics/data');
@@ -38,12 +38,13 @@ router.post("/login", async (req, res) => {
 
         const token = jwt.sign(
             { id: user.id, nome: user.name },
-            process.env.JWT_SECRET || "CHAVE_PADRAO",
+            process.env.JWT_SECRET || "MINHA_CHAVE_SUPER_SECRETA",
             { expiresIn: "24h" }
         );
 
-        res.json({
-            token,
+        return res.json({
+            message: "Login realizado com sucesso!",
+            token: token,
             user
         });
 
@@ -123,7 +124,6 @@ router.post("/sites/add", async (req, res) => {
     try {
         const { user_id, name, url, ga4_property_id } = req.body;
 
-        // usuário
         const [userRows] = await pool.query(
             "SELECT trial_ends, assinado FROM users WHERE id = ?", 
             [user_id]
@@ -139,7 +139,6 @@ router.post("/sites/add", async (req, res) => {
             return res.status(403).json({ error: "Trial expirado" });
         }
 
-        // duplicado
         const [dup] = await pool.query(
             "SELECT id FROM sites WHERE user_id = ? AND url = ?", 
             [user_id, url]
@@ -149,7 +148,6 @@ router.post("/sites/add", async (req, res) => {
             return res.status(400).json({ error: "Site já cadastrado" });
         }
 
-        // limite 3
         if (!user.assinado) {
             const [count] = await pool.query(
                 "SELECT COUNT(*) as total FROM sites WHERE user_id = ?", 
@@ -161,10 +159,14 @@ router.post("/sites/add", async (req, res) => {
             }
         }
 
-        // inserir
         const [result] = await pool.query(
             "INSERT INTO sites (user_id, name, url, ga4_property_id, status) VALUES (?, ?, ?, ?, 'online')",
             [user_id, name, url, ga4_property_id]
+        );
+
+        await pool.query(
+            "INSERT INTO uptime_logs (site_id, status) VALUES (?, 'online')",
+            [result.insertId]
         );
 
         res.json({
@@ -197,22 +199,6 @@ router.get("/sites/user/:userId", async (req, res) => {
 });
 
 
-// ================= DELETAR =================
-router.delete("/sites/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        await pool.query("DELETE FROM uptime_logs WHERE site_id = ?", [id]);
-        await pool.query("DELETE FROM sites WHERE id = ?", [id]);
-
-        res.json({ message: "Deletado" });
-
-    } catch (err) {
-        res.status(500).json({ error: "Erro ao deletar" });
-    }
-});
-
-
 // ================= DETALHES =================
 router.get("/sites/detalhes/:id", async (req, res) => {
     try {
@@ -230,26 +216,20 @@ router.get("/sites/detalhes/:id", async (req, res) => {
     }
 });
 
+
 // ================= UPDATE SITE =================
 router.put('/sites/update/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const { 
+        name, url, ga4_property_id, 
+        event_whatsapp, event_purchase, 
+        event_checkout, event_cart, event_lead 
+    } = req.body;
+
     try {
-        console.log("🔥 UPDATE CHAMADO");
-
-        const { id } = req.params;
-
-        const {
-            name,
-            url,
-            ga4_property_id,
-            event_whatsapp,
-            event_purchase,
-            event_checkout,
-            event_cart,
-            event_lead
-        } = req.body;
-
-        await pool.query(`
-            UPDATE sites SET 
+        await pool.query(
+            `UPDATE sites SET 
                 name = ?, 
                 url = ?, 
                 ga4_property_id = ?, 
@@ -257,27 +237,81 @@ router.put('/sites/update/:id', async (req, res) => {
                 event_purchase = ?, 
                 event_checkout = ?, 
                 event_cart = ?, 
-                event_lead = ?
-            WHERE id = ?
-        `, [
-            name,
-            url,
-            ga4_property_id,
-            event_whatsapp,
-            event_purchase,
-            event_checkout,
-            event_cart,
-            event_lead,
-            id
-        ]);
+                event_lead = ? 
+            WHERE id = ?`,
+            [
+                name || null,
+                url || null,
+                ga4_property_id || null,
+                event_whatsapp || '',
+                event_purchase || '',
+                event_checkout || '',
+                event_cart || '',
+                event_lead || '',
+                id
+            ]
+        );
 
-        console.log("✅ UPDATE OK");
-
-        res.json({ success: true });
+        res.json({ message: "Site atualizado!" });
 
     } catch (err) {
-        console.error("❌ ERRO UPDATE:", err);
+        console.error("❌ Erro:", err.message);
         res.status(500).json({ error: err.message });
+    }
+});
+
+
+// ================= DELETE =================
+router.delete("/sites/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        await pool.query("DELETE FROM uptime_logs WHERE site_id = ?", [id]);
+        await pool.query("DELETE FROM sites WHERE id = ?", [id]);
+
+        res.json({ message: "Deletado" });
+
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao deletar" });
+    }
+});
+
+
+// ================= KPI =================
+router.get("/kpis/:site_id", async (req, res) => {
+    try {
+        const { site_id } = req.params;
+
+        const [rows] = await pool.query("SELECT * FROM sites WHERE id = ?", [site_id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Site não encontrado" });
+        }
+
+        const site = rows[0];
+
+        res.json({
+            nome_site: site.name,
+            usuarios_ativos: 0,
+            receita: 0,
+            ticket_medio: 0,
+            ctr_whatsapp: "0%",
+            top_produtos: [],
+            uptime: Array(60).fill("online"),
+            funnel: []
+        });
+
+    } catch (err) {
+        res.status(200).json({
+            nome_site: "Erro",
+            usuarios_ativos: 0,
+            receita: 0,
+            ticket_medio: 0,
+            ctr_whatsapp: "0%",
+            top_produtos: [],
+            uptime: Array(60).fill("offline"),
+            funnel: []
+        });
     }
 });
 
