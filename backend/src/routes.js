@@ -465,48 +465,65 @@ router.get("/sites/detalhes/:id", async (req, res) => {
 
 // --- 9. EDITAR SITE EXISTENTE (Sintaxe correta para PostgreSQL) ---
 router.put('/sites/update/:id', async (req, res) => {
+    const { id } = req.params;
+    
+    // Pegamos os dados e garantimos que se vierem undefined, virem null ou string vazia
+    const { 
+        name, url, ga4_property_id, 
+        event_whatsapp, event_purchase, 
+        event_checkout, event_cart, event_lead 
+    } = req.body;
+
     try {
-        const { id } = req.params;
-
-        const { 
-            name, 
-            url, 
-            ga4_property_id, 
-            event_whatsapp, 
-            event_purchase, 
-            event_checkout, 
-            event_cart, 
-            event_lead 
-        } = req.body;
-
-        await pool.query(`
+        const query = `
             UPDATE sites SET 
-                name = ?,
-                url = ?,
-                ga4_property_id = ?,
-                event_whatsapp = ?,
-                event_purchase = ?,
-                event_checkout = ?,
-                event_cart = ?,
-                event_lead = ?
-            WHERE id = ?
-        `, [
-            name,
-            url,
-            ga4_property_id,
-            event_whatsapp,
-            event_purchase,
-            event_checkout,
-            event_cart,
-            event_lead,
-            id
-        ]);
+                name = $1, 
+                url = $2, 
+                ga4_property_id = $3, 
+                event_whatsapp = $4, 
+                event_purchase = $5, 
+                event_checkout = $6, 
+                event_cart = $7, 
+                event_lead = $8 
+            WHERE id = $9
+        `;
 
-        res.json({ success: true });
+        const values = [
+            name || null, 
+            url || null, 
+            ga4_property_id || null, 
+            event_whatsapp || '', 
+            event_purchase || '', 
+            event_checkout || '', 
+            event_cart || '', 
+            event_lead || '', 
+            id
+        ];
+
+        const [result] = await pool.query(
+    "INSERT INTO users (name, email, password, trial_ends) VALUES (?, ?, ?, ?)",
+    [nome, email, senhaCripto, trialEnds]
+);
+
+res.status(201).json({ 
+    message: "Usuário criado!", 
+    user: { 
+        id: result.insertId, // No MySQL usamos insertId
+        name: nome, 
+        email: email 
+    } 
+});
 
     } catch (err) {
-        console.error("ERRO UPDATE:", err.message);
-        res.status(500).json({ error: "Erro ao atualizar site" });
+        // Logamos apenas a MENSAGEM do erro no console para não travar o log
+        console.error("❌ Erro no banco:", err.message); 
+        
+        // NUNCA envie o objeto 'err' direto no .json()
+        return res.status(500).json({ 
+            error: "Erro ao atualizar site no banco de dados.",
+            details: err.message // Envie apenas a string da mensagem
+        });
     }
 });
+
 module.exports = router;
