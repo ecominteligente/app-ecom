@@ -13,25 +13,8 @@ const getStripe = () => {
     return require("stripe")(key);
 };
 
-const fs = require('fs');
-const path = require('path');
-
-const credsPath = path.join(__dirname, '../google-credentials.json');
-
-// Tenta restaurar o arquivo físico se ele sumiu
-if (!fs.existsSync(credsPath) && process.env.GOOGLE_CONFIG) {
-    try {
-        // Limpa possíveis espaços em branco antes de salvar
-        const cleanConfig = process.env.GOOGLE_CONFIG.trim();
-        fs.writeFileSync(credsPath, cleanConfig);
-    } catch (err) {
-        console.error("Erro ao criar arquivo:", err.message);
-    }
-}
-
-// Inicializa o cliente do jeito que você confirmou que funciona
 const analyticsClient = new BetaAnalyticsDataClient({
-    keyFilename: credsPath,
+    keyFilename: path.join(__dirname, '../google-credentials.json'),
 });
 
 // --- 2. ROTA DE LOGIN ---
