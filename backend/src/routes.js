@@ -230,5 +230,55 @@ router.get("/sites/detalhes/:id", async (req, res) => {
     }
 });
 
+// ================= UPDATE SITE =================
+router.put('/sites/update/:id', async (req, res) => {
+    try {
+        console.log("🔥 UPDATE CHAMADO");
+
+        const { id } = req.params;
+
+        const {
+            name,
+            url,
+            ga4_property_id,
+            event_whatsapp,
+            event_purchase,
+            event_checkout,
+            event_cart,
+            event_lead
+        } = req.body;
+
+        await pool.query(`
+            UPDATE sites SET 
+                name = ?, 
+                url = ?, 
+                ga4_property_id = ?, 
+                event_whatsapp = ?, 
+                event_purchase = ?, 
+                event_checkout = ?, 
+                event_cart = ?, 
+                event_lead = ?
+            WHERE id = ?
+        `, [
+            name,
+            url,
+            ga4_property_id,
+            event_whatsapp,
+            event_purchase,
+            event_checkout,
+            event_cart,
+            event_lead,
+            id
+        ]);
+
+        console.log("✅ UPDATE OK");
+
+        res.json({ success: true });
+
+    } catch (err) {
+        console.error("❌ ERRO UPDATE:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 module.exports = router;
