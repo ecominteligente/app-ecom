@@ -1,4 +1,3 @@
-const path = require("path");
 const express = require("express");
 const router = express.Router();
 const pool = require("./db");
@@ -210,6 +209,19 @@ router.get("/kpis/:site_id", async (req, res) => {
             uptime: Array(60).fill("online")
         });
     } catch (err) { res.status(200).json({ nome_site: "Erro", uptime: Array(60).fill("offline") }); }
+});
+
+// --- 6.5 LISTAR SITES DO USUÁRIO ---
+router.get("/sites/user/:user_id", async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            "SELECT * FROM sites WHERE user_id = ? ORDER BY id DESC",
+            [req.params.user_id]
+        );
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao buscar sites." });
+    }
 });
 
 // --- 7. DELETAR ---
