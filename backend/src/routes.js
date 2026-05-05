@@ -281,4 +281,116 @@ router.put('/sites/update/:id', async (req, res) => {
     }
 });
 
+// ================= KPIs (SAFE VERSION) =================
+router.get("/kpis/:site_id", async (req, res) => {
+    try {
+        const { site_id } = req.params;
+
+        // busca site (MYSQL CORRETO)
+        const [rows] = await pool.query(
+            "SELECT * FROM sites WHERE id = ?", 
+            [site_id]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Site não encontrado" });
+        }
+
+        const site = rows[0];
+
+        // 🚨 PROTEÇÃO: se não tiver GA4 configurado
+        if (!site.ga4_property_id) {
+            return res.json({
+                nome_site: site.name,
+                usuarios_ativos: 0,
+                compras: 0,
+                conversao: "0%",
+                ctr_whatsapp: "0%",
+                receita: 0,
+                ticket_medio: 0,
+                regioes: [],
+                top_regiao: "---",
+                origens: [0, 0, 0],
+                top_produtos: [],
+                funnel: [],
+                uptime: Array(60).fill("offline")
+            });
+        }
+
+        // 🚨 PROTEÇÃO: se não tiver credencial GA4
+        let analyticsClientSafe = null;
+
+        try {
+            analyticsClientSafe = new BetaAnalyticsDataClient({
+                keyFilename: './google-credentials.json',
+            });
+        } catch (e) {
+            console.log("⚠️ GA4 não configurado");
+        }
+
+        if (!analyticsClientSafe) {
+            return res.json({
+                nome_site: site.name,
+                usuarios_ativos: 0,
+                compras: 0,
+                conversao: "0%",
+                ctr_whatsapp: "0%",
+                receita: 0,
+                ticket_medio: 0,
+                regioes: [],
+                top_regiao: "---",
+                origens: [0, 0, 0],
+                top_produtos: [],
+                funnel: [],
+                uptime: Array(60).fill("offline")
+            });
+        }
+
+        // ================= GA4 REAL =================
+        const propertyId = site.ga4_property_id;
+
+        let ativos = 0;
+
+        try {
+            const [resAtivos] = await analyticsClientSafe.runRealtimeReport({
+                property: `properties/${propertyId}`,
+                metrics: [{ name: 'activeUsers' }]
+            });
+
+            ativos = parseInt(resAtivos.rows?.[0]?.metricValues?.[0]?.value) || 0;
+
+        } catch (err) {
+            console.log("⚠️ erro GA4:", err.message);
+        }
+
+        res.json({
+            nome_site: site.name,
+            usuarios_ativos: ativos,
+            compras: 0,
+            conversao: "0%",
+            ctr_whatsapp: "0%",
+            receita: 0,
+            ticket_medio: 0,
+            regioes: [],
+            top_regiao: "---",
+            origens: [0, 0, 0],
+            top_produtos: [],
+            funnel: [],
+            uptime: Array(60).fill("online")
+        });
+
+    } catch (err) {
+        console.error("❌ ERRO KPI:", err.message);
+
+        res.status(200).json({
+            nome_site: "Erro",
+            usuarios_ativos: 0,
+            receita: 0,
+            ctr_whatsapp: "0%",
+            uptime: Array(60).fill("offline"),
+            funnel: []
+        });
+    }
+});
+
 module.exports = router;
