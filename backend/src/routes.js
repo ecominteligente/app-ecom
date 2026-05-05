@@ -324,7 +324,7 @@ router.get("/kpis/:site_id", async (req, res) => {
 
         try {
             analyticsClientSafe = new BetaAnalyticsDataClient({
-                keyFilename: './google-credentials.json',
+                keyFilename: path.join(__dirname, 'google-credentials.json')
             });
         } catch (e) {
             console.log("⚠️ GA4 não configurado");
