@@ -14,7 +14,9 @@ const getStripe = () => {
 };
 
 const analyticsClient = new BetaAnalyticsDataClient({
-    keyFilename: path.join(__dirname, '../google-credentials.json'),
+    // Mudamos de keyFilename para credentials
+    // O JSON.parse transforma o texto da variável em um objeto que o Google entende
+    credentials: JSON.parse(process.env.GOOGLE_CONFIG),
 });
 
 // --- 2. ROTA DE LOGIN ---
