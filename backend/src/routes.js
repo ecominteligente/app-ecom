@@ -16,7 +16,7 @@ const getStripe = () => {
 const path = require('path');
 
 const analyticsClient = new BetaAnalyticsDataClient({
-    keyFilename: path.join(__dirname, '../google-credentials.json'),
+    keyFilename: path.join(__dirname, '../../backend/google-credentials.json')
 });
 
 
