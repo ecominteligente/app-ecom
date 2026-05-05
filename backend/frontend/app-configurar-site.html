@@ -277,13 +277,15 @@
 </footer>
 
 <script>
-    // 1. CAPTURA O ID DA URL
+    // 1. CAPTURA O ID DA URL PARA MODO EDIÇÃO
     const urlParams = new URLSearchParams(window.location.search);
     const siteIdParaEditar = urlParams.get('id');
 
+    // 2. PROTEÇÃO DE ACESSO
     function verificarAcesso() {
         const token = localStorage.getItem('token');
         if (!token) {
+            // Se não houver token, redireciona para login (comportamento em produção)
             window.location.replace('app-login.html');
             return false;
         }
@@ -291,15 +293,10 @@
         return true;
     }
 
+    // 3. CARREGAR DADOS SE FOR EDIÇÃO
     async function carregarDadosParaEdicao() {
-        if (!siteIdParaEditar) {
-            console.log("🚀 Modo: Cadastro Novo");
-            return;
-        }
+        if (!siteIdParaEditar) return;
 
-        console.log("📝 Modo: Edição Ativado para o ID:", siteIdParaEditar);
-        
-        // Ajusta os textos da tela
         const titulo = document.querySelector('h1');
         const botao = document.querySelector('.btn-activate');
         if(titulo) titulo.innerText = "Editar Configuração";
@@ -313,59 +310,52 @@
             const site = await res.json();
 
             if (res.ok) {
-                // Preenchimento seguro (verifica se o elemento existe antes de setar o valor)
-                if(document.getElementById('site_name')) document.getElementById('site_name').value = site.name || '';
-                if(document.getElementById('site_url')) document.getElementById('site_url').value = site.url || '';
-                if(document.getElementById('ga4_id')) document.getElementById('ga4_id').value = site.ga4_property_id || '';
-                if(document.getElementById('event_whatsapp')) document.getElementById('event_whatsapp').value = site.event_whatsapp || '';
-                if(document.getElementById('event_purchase')) document.getElementById('event_purchase').value = site.event_purchase || '';
-                if(document.getElementById('event_checkout')) document.getElementById('event_checkout').value = site.event_checkout || '';
-                if(document.getElementById('event_cart')) document.getElementById('event_cart').value = site.event_cart || '';
-                if(document.getElementById('event_lead')) document.getElementById('event_lead').value = site.event_lead || '';
-                console.log("✅ Dados carregados com sucesso!");
+                document.getElementById('site_name').value = site.name || '';
+                document.getElementById('site_url').value = site.url || '';
+                document.getElementById('ga4_id').value = site.ga4_property_id || '';
+                document.getElementById('event_whatsapp').value = site.event_whatsapp || '';
+                document.getElementById('event_purchase').value = site.event_purchase || '';
+                document.getElementById('event_checkout').value = site.event_checkout || '';
+                document.getElementById('event_cart').value = site.event_cart || '';
+                document.getElementById('event_lead').value = site.event_lead || '';
             }
         } catch (err) {
             console.error("❌ Erro ao carregar dados:", err);
         }
     }
 
+    // 4. ENVIAR DADOS E REDIRECIONAR
     async function enviarDados(event) {
-        // MUITO IMPORTANTE: Previne o comportamento padrão do form
         event.preventDefault();
-        event.stopPropagation();
         
-        console.log("adsasdsda Clique detectado! Iniciando salvamento...");
-
         const msg = document.getElementById('mensagem');
         if(msg) {
             msg.style.color = "#fff";
-            msg.textContent = "⚙️ Processando...";
+            msg.textContent = "⚙️ Gravando dados no banco...";
         }
 
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
 
+        // Montagem do objeto seguindo o mapeamento do GA4
         const dados = {
-    user_id: userId,
-    name: document.getElementById('site_name').value,
-    url: document.getElementById('site_url').value,
-    ga4_property_id: document.getElementById('ga4_id').value,
-
-    event_whatsapp: document.getElementById('event_whatsapp').value.trim(), // 👈 vírgula aqui
-
-    event_purchase: document.getElementById('event_purchase').value,
-    event_checkout: document.getElementById('event_checkout').value,
-    event_cart: document.getElementById('event_cart').value,
-    event_lead: document.getElementById('event_lead').value
-};
+            user_id: userId,
+            name: document.getElementById('site_name').value,
+            url: document.getElementById('site_url').value,
+            ga4_property_id: document.getElementById('ga4_id').value,
+            // Fallback para nomes padrão caso o campo esteja vazio
+            event_whatsapp: document.getElementById('event_whatsapp').value.trim() || 'click_whatsapp',
+            event_purchase: document.getElementById('event_purchase').value.trim() || 'purchase',
+            event_checkout: document.getElementById('event_checkout').value.trim() || 'begin_checkout',
+            event_cart: document.getElementById('event_cart').value.trim() || 'add_to_cart',
+            event_lead: document.getElementById('event_lead').value.trim() || 'generate_lead'
+        };
 
         const metodo = siteIdParaEditar ? 'PUT' : 'POST';
         const urlFinal = siteIdParaEditar 
-    ? `https://ecominteligente.com.br/api/sites/update/${siteIdParaEditar}` 
-    : 'https://ecominteligente.com.br/api/sites/add';
+            ? `https://ecominteligente.com.br/api/sites/update/${siteIdParaEditar}` 
+            : 'https://ecominteligente.com.br/api/sites/add';
         
-        console.log(`📡 Enviando via ${metodo} para: ${urlFinal}`);
-
         try {
             const response = await fetch(urlFinal, {
                 method: metodo,
@@ -376,40 +366,35 @@
                 body: JSON.stringify(dados)
             });
 
-            console.log("Status da resposta:", response.status);
-
             if (response.ok) {
                 if(msg) {
                     msg.style.color = "#10b981";
-                    msg.textContent = "✅ Sucesso! Redirecionando...";
+                    msg.textContent = "✅ Dados configurados com sucesso!";
                 }
-                console.log("✅ Salvo com sucesso! Redirecionando em 1.5s...");
+
+                // Redirecionamento para a listagem conforme sua solicitação
                 setTimeout(() => {
                     window.location.href = 'app-meus-sites.html';
-                }, 1500);
+                }, 1200);
             } else {
                 const resErro = await response.json();
                 if(msg) {
                     msg.style.color = "#ef4444";
                     msg.textContent = "❌ Erro: " + (resErro.error || "Falha ao salvar");
                 }
-                console.error("❌ Erro do servidor:", resErro);
             }
         } catch (err) {
             console.error("❌ Erro na requisição:", err);
-            if(msg) msg.textContent = "❌ Servidor offline ou erro de rede.";
+            if(msg) msg.textContent = "❌ Erro de conexão com o servidor.";
         }
     }
 
-    // INICIALIZAÇÃO CORRETA
+    // 5. INICIALIZAÇÃO
     if (verificarAcesso()) {
         window.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('form-config');
             if (form) {
                 form.addEventListener('submit', enviarDados);
-                console.log("🎯 Event Listener de submit ativado!");
-            } else {
-                console.error("❌ Erro: Formulário 'form-config' não encontrado!");
             }
             carregarDadosParaEdicao();
         });
