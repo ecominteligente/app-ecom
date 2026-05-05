@@ -237,7 +237,7 @@ router.put('/sites/update/:id', async (req, res) => {
                 event_purchase = ?, 
                 event_checkout = ?, 
                 event_cart = ?, 
-                event_lead = ? 
+                event_lead = ?
             WHERE id = ?`,
             [
                 name || null,
@@ -255,7 +255,7 @@ router.put('/sites/update/:id', async (req, res) => {
         res.json({ message: "Site atualizado!" });
 
     } catch (err) {
-        console.error("❌ Erro:", err.message);
+        console.error("Erro update:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
