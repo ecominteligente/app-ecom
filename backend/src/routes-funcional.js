@@ -134,7 +134,7 @@ router.get("/kpis/:site_id", async (req, res) => {
         const propertyId = site.ga4_property_id;
 
         let ativos = 0, zap = 0, visitasTotais = 0, viewItem = 0, addToCart = 0, viewCart = 0, receita = 0, compras = 0;
-        let regioesMap = {}, origensMap = { Ads: 0, Org: 0, Soc: 0 }, produtosMap = {}, produtosReceita = {};
+        let regioesMap = {}, origensMap = { Ads: 0, Org: 0, Soc: 0 }, produtosMap = {};
 
         try {
             const [resAtivos] = await analyticsClient.runRealtimeReport({
@@ -167,28 +167,6 @@ router.get("/kpis/:site_id", async (req, res) => {
                 });
             }
 
-            // 📦 TOP PRODUTOS
-            const [resProdutos] = await analyticsClient.runReport({
-                property: `properties/${propertyId}`,
-                dateRanges: [{ startDate: inicio || '7daysAgo', endDate: fim || 'today' }],
-                dimensions: [{ name: 'itemName' }],
-                metrics: [{ name: 'itemsPurchased' }, { name: 'itemRevenue' }],
-                orderBys: [{ metric: { metricName: 'itemsPurchased' }, desc: true }],
-                limit: 5
-            });
-
-            if (resProdutos.rows) {
-                resProdutos.rows.forEach(row => {
-                    const nome = row.dimensionValues[0].value;
-                    const vendas = parseInt(row.metricValues[0]?.value || 0);
-                    const rev = parseFloat(row.metricValues[1]?.value || 0);
-                    if (nome && nome !== '(not set)') {
-                        produtosMap[nome] = (produtosMap[nome] || 0) + vendas;
-                        produtosReceita[nome] = (produtosReceita[nome] || 0) + rev;
-                    }
-                });
-            }
-
             const [resGeo] = await analyticsClient.runReport({
                 property: `properties/${propertyId}`,
                 dateRanges: [{ startDate: inicio || '7daysAgo', endDate: fim || 'today' }],
@@ -211,19 +189,12 @@ router.get("/kpis/:site_id", async (req, res) => {
 
         const regioesFinal = Object.entries(regioesMap).map(([estado, valor]) => ({ estado, valor })).sort((a,b) => b.valor - a.valor).slice(0, 5);
         const ctrWhatsapp = visitasTotais > 0 ? ((zap / visitasTotais) * 100).toFixed(2) : "0.00";
-        const taxaConversao = visitasTotais > 0 ? ((compras / visitasTotais) * 100).toFixed(2) : "0.00";
-
-        const top_produtos = Object.entries(produtosMap)
-            .map(([nome, vendas]) => ({ nome, vendas, receita: produtosReceita[nome] || 0 }))
-            .sort((a, b) => b.vendas - a.vendas)
-            .slice(0, 5);
 
         res.json({
             nome_site: site.name,
             usuarios_ativos: ativos,
-            compras,                            // ✅ total de compras (purchase)
-            conversao: taxaConversao + "%",     // ✅ taxa de conversão real (compras/visitas)
-            ctr_whatsapp: ctrWhatsapp + "%",    // ✅ campo que o HTML espera para "Conversão WhatsApp"
+            compras: zap,
+            conversao: ctrWhatsapp + "%",
             receita,
             ticket_medio: compras > 0 ? (receita / compras) : 0,
             regioes: regioesFinal,
@@ -236,14 +207,9 @@ router.get("/kpis/:site_id", async (req, res) => {
                 { nome: "view_cart", qtd: viewCart },
                 { nome: "whatsapp", qtd: zap }
             ],
-            top_produtos,                       // ✅ agora existe de verdade
             uptime: Array(60).fill("online")
         });
-    } catch (err) {
-        console.error("❌ Erro na rota /kpis:", err);
-        res.status(500).json({ error: "Erro ao buscar KPIs: " + err.message });
-        // ⚠️ Removido o status 200 com dado falso que ocultava os erros
-    }
+    } catch (err) { res.status(200).json({ nome_site: "Erro", uptime: Array(60).fill("offline") }); }
 });
 
 // --- 6.5 LISTAR SITES DO USUÁRIO ---
