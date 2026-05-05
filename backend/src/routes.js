@@ -13,21 +13,9 @@ const getStripe = () => {
     return require("stripe")(key);
 };
 
-const fs = require("fs");
-
-const credentialsPath = "/tmp/google-credentials.json";
-
-// cria o arquivo temporário (se ainda não existir)
-fs.writeFileSync(
-    credentialsPath,
-    process.env.GOOGLE_CONFIG
-);
-
-// força o Google a usar arquivo (padrão oficial)
-process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
-
-// inicializa sem credentials manual
-const analyticsClient = new BetaAnalyticsDataClient();
+const analyticsClient = new BetaAnalyticsDataClient({
+    keyFilename: path.join(__dirname, '../google-credentials.json'),
+});
 
 // --- 2. ROTA DE LOGIN ---
 router.post("/login", async (req, res) => {
