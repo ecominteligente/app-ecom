@@ -13,11 +13,21 @@ const getStripe = () => {
     return require("stripe")(key);
 };
 
-const analyticsClient = new BetaAnalyticsDataClient({
-    // Mudamos de keyFilename para credentials
-    // O JSON.parse transforma o texto da variável em um objeto que o Google entende
-    credentials: JSON.parse(process.env.GOOGLE_CONFIG),
-});
+const fs = require("fs");
+
+const credentialsPath = "/tmp/google-credentials.json";
+
+// cria o arquivo temporário (se ainda não existir)
+fs.writeFileSync(
+    credentialsPath,
+    process.env.GOOGLE_CONFIG
+);
+
+// força o Google a usar arquivo (padrão oficial)
+process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
+
+// inicializa sem credentials manual
+const analyticsClient = new BetaAnalyticsDataClient();
 
 // --- 2. ROTA DE LOGIN ---
 router.post("/login", async (req, res) => {
