@@ -13,8 +13,25 @@ const getStripe = () => {
     return require("stripe")(key);
 };
 
+const fs = require('fs');
+const path = require('path');
+
+// Define o caminho onde o arquivo DEVE estar
+const credsPath = path.join(__dirname, '../google-credentials.json');
+
+// Se o arquivo não existir (o que acontece após o deploy do Git), ele será criado agora
+if (!fs.existsSync(credsPath) && process.env.GOOGLE_CONFIG) {
+    try {
+        fs.writeFileSync(credsPath, process.env.GOOGLE_CONFIG);
+        console.log("✅ Arquivo de credenciais restaurado automaticamente!");
+    } catch (err) {
+        console.error("❌ Falha ao restaurar o arquivo:", err.message);
+    }
+}
+
+// O cliente continua lendo do arquivo, do jeito que você sabe que funciona
 const analyticsClient = new BetaAnalyticsDataClient({
-    keyFilename: path.join(__dirname, '../google-credentials.json'),
+    keyFilename: credsPath,
 });
 
 // --- 2. ROTA DE LOGIN ---
