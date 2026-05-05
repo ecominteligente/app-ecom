@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const router = express.Router();
 const pool = require("./db");
@@ -223,7 +224,7 @@ router.get("/sites/user/:user_id", async (req, res) => {
         res.status(500).json({ error: "Erro ao buscar sites." });
     }
 });
-
+ 
 // --- 7. DELETAR ---
 router.delete("/sites/:id", async (req, res) => {
     try {
