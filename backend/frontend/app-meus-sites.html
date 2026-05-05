@@ -215,7 +215,11 @@
 
     <div class="header">
         <div class="brand">Ecom <span>Inteligente</span></div>
-        <a href="app-configurar-site.html" class="btn-add"><i class="fa-solid fa-plus"></i> Novo Site</a>
+        <div style="display:flex; align-items:center; gap:16px;">
+            <span id="nome-usuario" style="color:#94a3b8; font-size:14px; font-weight:600;"></span>
+            <a href="app-configurar-site.html" class="btn-add"><i class="fa-solid fa-plus"></i> Novo Site</a>
+            <button onclick="sair()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:#94a3b8;padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;">Sair</button>
+        </div>
     </div>
 
     <div id="aviso-trial" style="display:none;">
@@ -245,9 +249,19 @@
     <script>
     const token = localStorage.getItem('token');
     const userId = localStorage.getItem('userId');
+    const usuarioNome = localStorage.getItem('usuarioNome');
+
+    // Mostra nome do usuário no header
+    const nomeEl = document.getElementById('nome-usuario');
+    if (nomeEl && usuarioNome) nomeEl.textContent = `Olá, ${usuarioNome} 👋`;
 
     // Proteção: se não tiver logado, volta pro login
     if (!token || !userId || userId === "null") {
+        window.location.href = 'app-login.html';
+    }
+
+    function sair() {
+        localStorage.clear();
         window.location.href = 'app-login.html';
     }
 
