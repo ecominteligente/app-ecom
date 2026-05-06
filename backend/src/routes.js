@@ -252,13 +252,13 @@ router.get("/kpis/:site_id", async (req, res) => {
             top_regiao: regioesFinal[0]?.estado || "---",
             origens: [origensMap['Ads'], origensMap['Org'], origensMap['Soc']],
             funnel: [
-                { nome: "Visitas", qtd: visitasTotais },
-                { nome: "Produtos", qtd: viewItem },
-                { nome: "Carrinho", qtd: addToCart },
-                { nome: "Checkout", qtd: viewCart }, // ✅ Agora separado
-                { nome: "WhatsApp", qtd: zap },
-                { nome: "Vendas", qtd: compras }
-            ],
+    { nome: `Visitas: ${visitasTotais}`, qtd: visitasTotais },
+    { nome: `Produtos: ${viewItem}`, qtd: viewItem },
+    { nome: `Carrinho: ${addToCart}`, qtd: addToCart },
+    { nome: `Checkout: ${viewCart}`, qtd: viewCart },
+    { nome: `WhatsApp: ${zap}`, qtd: zap },
+    { nome: `Vendas: ${compras}`, qtd: compras }
+],
             top_produtos,
             uptime: Array(60).fill("online")
         });
