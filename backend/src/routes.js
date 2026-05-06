@@ -90,10 +90,14 @@ router.post("/auth/register", async (req, res) => {
     }
 });
 
-// --- 5. ADICIONAR SITE (COM AS 3 TRAVAS) ---
+// --- 5. ADICIONAR SITE (CORRIGIDO PARA SALVAR EVENTOS) ---
 router.post("/sites/add", async (req, res) => {
     try {
-        const { user_id, name, url, ga4_property_id } = req.body;
+        // Agora capturamos todos os campos de eventos vindos do formulário
+        const { 
+            user_id, name, url, ga4_property_id, 
+            event_whatsapp, event_purchase, event_checkout, event_cart, event_lead 
+        } = req.body;
 
         const [userCheck] = await pool.query("SELECT trial_ends, assinado FROM users WHERE id = ?", [user_id]);
         const user = userCheck[0];
@@ -110,13 +114,23 @@ router.post("/sites/add", async (req, res) => {
             if (contagem[0].total >= 3) return res.status(403).json({ error: "Limite de 3 sites atingido!" });
         }
 
+        // INSERT incluindo as novas colunas de eventos
         const [result] = await pool.query(
-            "INSERT INTO sites (user_id, name, url, ga4_property_id, status) VALUES (?, ?, ?, ?, 'online')",
-            [user_id, name, url, ga4_property_id]
+            `INSERT INTO sites 
+            (user_id, name, url, ga4_property_id, event_whatsapp, event_purchase, event_checkout, event_cart, event_lead, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'online')`,
+            [
+                user_id, name, url, ga4_property_id, 
+                event_whatsapp || 'click_whatsapp', // Fallback caso venha vazio
+                event_purchase || 'purchase', 
+                event_checkout || 'begin_checkout', 
+                event_cart || 'add_to_cart', 
+                event_lead || 'generate_lead'
+            ]
         );
 
         await pool.query("INSERT INTO uptime_logs (site_id, status) VALUES (?, 'online')", [result.insertId]);
-        res.status(201).json({ message: "Site configurado!", site: { id: result.insertId } });
+        res.status(201).json({ message: "Site configurado com eventos!", site: { id: result.insertId } });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -133,6 +147,12 @@ router.get("/kpis/:site_id", async (req, res) => {
 
         const site = siteResult[0];
         const propertyId = site.ga4_property_id;
+
+        // --- DEFINIÇÃO DOS NOMES DE BUSCA (Se vazio no banco, usa o padrão técnico) ---
+        const buscaZap = (site.event_whatsapp || '').trim().toLowerCase() || 'click_whatsapp';
+        const buscaPurchase = (site.event_purchase || '').trim().toLowerCase() || 'purchase';
+        const buscaCart = (site.event_cart || '').trim().toLowerCase() || 'add_to_cart';
+        const buscaCheckout = (site.event_checkout || '').trim().toLowerCase() || 'begin_checkout';
 
         let ativos = 0, zap = 0, visitasTotais = 0, viewItem = 0, addToCart = 0, viewCart = 0, receita = 0, compras = 0;
         let regioesMap = {}, origensMap = { Ads: 0, Org: 0, Soc: 0 }, produtosMap = {}, produtosReceita = {};
@@ -153,18 +173,25 @@ router.get("/kpis/:site_id", async (req, res) => {
 
             if (resEventos.rows) {
                 resEventos.rows.forEach(row => {
-                    const eventName = row.dimensionValues[0].value;
+                    const eventName = row.dimensionValues[0].value.toLowerCase(); // Forçamos lowercase para comparar
                     const count = parseInt(row.metricValues[0]?.value || 0);
                     const rev = parseFloat(row.metricValues[1]?.value || 0);
 
+                    // Comparações dinâmicas baseadas no que está no banco (ou no padrão)
                     if (eventName === 'page_view') visitasTotais += count;
                     if (eventName === 'view_item') viewItem += count;
-                    if (eventName === 'add_to_cart') addToCart += count;
+                    if (eventName === buscaCart) addToCart += count;
                     if (eventName === 'view_cart') viewCart += count;
+                    if (eventName === buscaCheckout) viewCart += count; // ou a variável que você usa para checkout
+                    
+                    // Lógica do WhatsApp: Agora sem o ".includes", comparando o nome exato
+                    if (eventName === buscaZap) zap += count;
 
-                    const eventZap = (site.event_whatsapp || '').toLowerCase().trim();
-                    if ((eventZap && eventName.toLowerCase() === eventZap) || (!eventZap && eventName.toLowerCase().includes('whatsapp'))) zap += count;
-                    if (eventName === 'purchase') { receita += rev; compras += count; }
+                    // Lógica de Venda
+                    if (eventName === buscaPurchase) { 
+                        receita += rev; 
+                        compras += count; 
+                    }
                 });
             }
 

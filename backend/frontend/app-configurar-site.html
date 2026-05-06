@@ -227,7 +227,7 @@
                     <label>Botão WhatsApp</label>
                     <div class="input-wrapper">
                         <i class="fa-brands fa-whatsapp"></i>
-                        <input type="text" id="event_whatsapp" placeholder="click_whatsapp">
+                        <input type="text" id="event_whatsapp" placeholder="Ex: click_whatsapp">
                     </div>
                 </div>
 
@@ -235,7 +235,7 @@
                     <label>Evento de Venda</label>
                     <div class="input-wrapper">
                         <i class="fa-solid fa-cart-shopping"></i>
-                        <input type="text" id="event_purchase" placeholder="purchase">
+                        <input type="text" id="event_purchase" placeholder="Ex: purchase">
                     </div>
                 </div>
 
@@ -243,7 +243,7 @@
                     <label>Início Checkout</label>
                     <div class="input-wrapper">
                         <i class="fa-solid fa-bag-shopping"></i>
-                        <input type="text" id="event_checkout" placeholder="begin_checkout">
+                        <input type="text" id="event_checkout" placeholder="Ex: begin_checkout">
                     </div>
                 </div>
 
@@ -251,7 +251,7 @@
                     <label>Adicionar Carrinho</label>
                     <div class="input-wrapper">
                         <i class="fa-solid fa-plus"></i>
-                        <input type="text" id="event_cart" placeholder="add_to_cart">
+                        <input type="text" id="event_cart" placeholder="Ex: add_to_cart">
                     </div>
                 </div>
 
@@ -341,16 +341,17 @@
         const userId = localStorage.getItem('userId');
 
         const dados = {
-            user_id: userId,
-            name: document.getElementById('site_name').value,
-            url: document.getElementById('site_url').value,
-            ga4_property_id: document.getElementById('ga4_id').value,
-            event_whatsapp: document.getElementById('event_whatsapp').value.trim() || 'click_whatsapp',
-            event_purchase: document.getElementById('event_purchase').value.trim() || 'purchase',
-            event_checkout: document.getElementById('event_checkout').value.trim() || 'begin_checkout',
-            event_cart: document.getElementById('event_cart').value.trim() || 'add_to_cart',
-            event_lead: document.getElementById('event_lead').value.trim() || 'generate_lead'
-        };
+    user_id: userId,
+    name: document.getElementById('site_name').value,
+    url: document.getElementById('site_url').value,
+    ga4_property_id: document.getElementById('ga4_id').value,
+    // Se estiver vazio, envia vazio mesmo (null ou string vazia)
+    event_whatsapp: document.getElementById('event_whatsapp').value.trim(),
+    event_purchase: document.getElementById('event_purchase').value.trim(),
+    event_checkout: document.getElementById('event_checkout').value.trim(),
+    event_cart: document.getElementById('event_cart').value.trim(),
+    event_lead: document.getElementById('event_lead').value.trim()
+};
 
         const metodo = siteIdParaEditar ? 'PUT' : 'POST';
         const urlFinal = siteIdParaEditar 
