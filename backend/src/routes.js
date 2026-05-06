@@ -148,7 +148,6 @@ router.get("/kpis/:site_id", async (req, res) => {
         const site = siteResult[0];
         const propertyId = site.ga4_property_id;
 
-        // --- DEFINIÇÃO DOS NOMES DE BUSCA (Se vazio no banco, usa o padrão técnico) ---
         const buscaZap = (site.event_whatsapp || '').trim().toLowerCase() || 'click_whatsapp';
         const buscaPurchase = (site.event_purchase || '').trim().toLowerCase() || 'purchase';
         const buscaCart = (site.event_cart || '').trim().toLowerCase() || 'add_to_cart';
@@ -173,25 +172,16 @@ router.get("/kpis/:site_id", async (req, res) => {
 
             if (resEventos.rows) {
                 resEventos.rows.forEach(row => {
-                    const eventName = row.dimensionValues[0].value.toLowerCase(); // Forçamos lowercase para comparar
+                    const eventName = row.dimensionValues[0].value.toLowerCase();
                     const count = parseInt(row.metricValues[0]?.value || 0);
                     const rev = parseFloat(row.metricValues[1]?.value || 0);
 
-                    // Comparações dinâmicas baseadas no que está no banco (ou no padrão)
                     if (eventName === 'page_view') visitasTotais += count;
                     if (eventName === 'view_item') viewItem += count;
                     if (eventName === buscaCart) addToCart += count;
-                    if (eventName === 'view_cart') viewCart += count;
-                    if (eventName === buscaCheckout) viewCart += count; // ou a variável que você usa para checkout
-                    
-                    // Lógica do WhatsApp: Agora sem o ".includes", comparando o nome exato
+                    if (eventName === buscaCheckout) viewCart += count; // Focado em begin_checkout
                     if (eventName === buscaZap) zap += count;
-
-                    // Lógica de Venda
-                    if (eventName === buscaPurchase) { 
-                        receita += rev; 
-                        compras += count; 
-                    }
+                    if (eventName === buscaPurchase) { receita += rev; compras += count; }
                 });
             }
 
@@ -238,8 +228,11 @@ router.get("/kpis/:site_id", async (req, res) => {
         } catch (gaErr) { console.error(gaErr); }
 
         const regioesFinal = Object.entries(regioesMap).map(([estado, valor]) => ({ estado, valor })).sort((a,b) => b.valor - a.valor).slice(0, 5);
+        
+        // Cálculos de Taxas
         const ctrWhatsapp = visitasTotais > 0 ? ((zap / visitasTotais) * 100).toFixed(2) : "0.00";
         const taxaConversao = visitasTotais > 0 ? ((compras / visitasTotais) * 100).toFixed(2) : "0.00";
+        const taxaAbandono = viewCart > 0 ? (((viewCart - compras) / viewCart) * 100).toFixed(2) : "0.00";
 
         const top_produtos = Object.entries(produtosMap)
             .map(([nome, vendas]) => ({ nome, vendas, receita: produtosReceita[nome] || 0 }))
@@ -249,28 +242,29 @@ router.get("/kpis/:site_id", async (req, res) => {
         res.json({
             nome_site: site.name,
             usuarios_ativos: ativos,
-            compras,                            // ✅ total de compras (purchase)
-            conversao: taxaConversao + "%",     // ✅ taxa de conversão real (compras/visitas)
-            ctr_whatsapp: ctrWhatsapp + "%",    // ✅ campo que o HTML espera para "Conversão WhatsApp"
+            compras,
+            conversao: taxaConversao + "%",
+            ctr_whatsapp: ctrWhatsapp + "%",
+            taxa_abandono: taxaAbandono + "%", // ✅ Nova métrica para o topo
             receita,
             ticket_medio: compras > 0 ? (receita / compras) : 0,
             regioes: regioesFinal,
             top_regiao: regioesFinal[0]?.estado || "---",
             origens: [origensMap['Ads'], origensMap['Org'], origensMap['Soc']],
             funnel: [
-                { nome: "page_view", qtd: visitasTotais },
-                { nome: "view_item", qtd: viewItem },
-                { nome: "add_to_cart", qtd: addToCart },
-                { nome: "view_cart", qtd: viewCart },
-                { nome: "whatsapp", qtd: zap }
+                { nome: "Visitas", qtd: visitasTotais },
+                { nome: "Produtos", qtd: viewItem },
+                { nome: "Carrinho", qtd: addToCart },
+                { nome: "Checkout", qtd: viewCart }, // ✅ Agora separado
+                { nome: "WhatsApp", qtd: zap },
+                { nome: "Vendas", qtd: compras }
             ],
-            top_produtos,                       // ✅ agora existe de verdade
+            top_produtos,
             uptime: Array(60).fill("online")
         });
     } catch (err) {
         console.error("❌ Erro na rota /kpis:", err);
         res.status(500).json({ error: "Erro ao buscar KPIs: " + err.message });
-        // ⚠️ Removido o status 200 com dado falso que ocultava os erros
     }
 });
 
