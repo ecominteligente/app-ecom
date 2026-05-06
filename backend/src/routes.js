@@ -14,7 +14,8 @@ const getStripe = () => {
 };
 
 const analyticsClient = new BetaAnalyticsDataClient({
-    keyFilename: path.join(__dirname, '../google-credentials.json'),
+    // O '../../' faz o Node sair da pasta 'src', sair da pasta 'nodejs' e chegar na raiz onde o arquivo está
+    keyFilename: path.join(__dirname, '../../google-credentials.json'),
 });
 
 // --- 2. ROTA DE LOGIN ---
