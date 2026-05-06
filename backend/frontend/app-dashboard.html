@@ -240,9 +240,13 @@ document.getElementById('conversao').innerText = data.conversao || "0%";
 document.getElementById('receita').innerText = formatarMoeda(data.receita || 0);
 document.getElementById('ticket').innerText = formatarMoeda(data.ticket_medio || 0);
 
-// 🔥 NOVAS MÉTRICAS DE PERFORMANCE
-document.getElementById('abandono').innerText = data.taxa_abandono || "0%"; 
-document.getElementById('rejeicao').innerText = data.ctr_whatsapp || "0%";
+// 🔥 AJUSTE AQUI: Mudamos de 'regiao' para os novos IDs do seu HTML
+if (document.getElementById('abandono')) {
+    document.getElementById('abandono').innerText = data.taxa_abandono || "0%";
+}
+if (document.getElementById('rejeicao')) {
+    document.getElementById('rejeicao').innerText = data.ctr_whatsapp || "0%";
+}
 
         // 🔥 FALTAVA ISSO (PRODUTOS)
         renderProdutos(data.top_produtos || []);
