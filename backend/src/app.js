@@ -10,22 +10,17 @@ app.use(express.json());
 const routes = require("./routes");
 app.use("/api", routes);
 
-// 🔥 Otimização de Performance
-const frontendPath = path.join(__dirname, "frontend");
+// frontend
+const frontendPath = "/home/u511733894/domains/ecominteligente.com.br/nodejs/frontend";
 
-// Servir arquivos estáticos com cache e extensões automáticas
+// AJUSTE AQUI: Adicionamos a opção de extensões automáticas
 app.use(express.static(frontendPath, { 
-  extensions: ['html', 'htm'],
-  maxAge: '1d' // Adiciona cache de 1 dia para arquivos que não mudam sempre (CSS/Imagens)
+  extensions: ['html', 'htm'] 
 }));
 
-// Fallback para a Home (Index) - Otimizado
+// Rota curinga (Asterisco) - Só entra se o arquivo físico não for encontrado acima
 app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"), (err) => {
-    if (err) {
-      res.status(404).send("Página não encontrada");
-    }
-  });
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 module.exports = app;
