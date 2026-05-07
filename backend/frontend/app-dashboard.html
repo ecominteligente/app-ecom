@@ -210,13 +210,25 @@ function drawUptime(uptimeData) {
     });
 }
 
+// 📅 AJUSTE AUTOMÁTICO DE DATA (Executa ao carregar para evitar o erro do dia seguinte)
+(function() {
+    const agora = new Date();
+    const dataHoje = agora.toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+    const inputInicio = document.getElementById('data-inicio');
+    const inputFim = document.getElementById('data-fim');
+    if (inputInicio && !inputInicio.value) inputInicio.value = dataHoje;
+    if (inputFim && !inputFim.value) inputFim.value = dataHoje;
+})();
+
 // 🚀 LOAD DATA
 async function loadData() {
     const btn = document.querySelector('button[onclick="loadData()"]');
-    const originalHTML = btn.innerHTML;
+    const originalHTML = btn ? btn.innerHTML : '';
 
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Filtrando...';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Filtrando...';
+    }
 
     const siteId = localStorage.getItem('siteId') || '19';
     const dataInicio = document.getElementById('data-inicio').value;
@@ -230,6 +242,9 @@ async function loadData() {
         });
 
         const data = res.ok ? await res.json() : {};
+        
+        // Chamar renderização do Uptime
+        if (data.uptime) drawUptime(data.uptime);
 
         // 🧠 KPIs Atualizados
 document.getElementById('nome-site').innerText = data.nome_site || "—";
