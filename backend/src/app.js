@@ -12,8 +12,13 @@ app.use("/api", routes);
 
 // frontend
 const frontendPath = "/home/u511733894/domains/ecominteligente.com.br/nodejs/frontend";
-app.use(express.static(frontendPath));
 
+// AJUSTE AQUI: Adicionamos a opção de extensões automáticas
+app.use(express.static(frontendPath, { 
+  extensions: ['html', 'htm'] 
+}));
+
+// Rota curinga (Asterisco) - Só entra se o arquivo físico não for encontrado acima
 app.get("*", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
